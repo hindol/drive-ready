@@ -1,5 +1,7 @@
 # DriveReady – Mock Driving Test Companion
 
+👉 **Live app:** https://hindol.github.io/drive-ready/
+
 DriveReady delivers a Washington-focused mock driving test experience while laying the groundwork for additional US states. The current pilot is limited to Washington so every feature—from the mock exam roster to the pre-exam checklist—uses Department of Licensing data and MUTCD assets tuned for local accuracy.
 
 ## Tech Stack
