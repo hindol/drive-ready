@@ -1,0 +1,80 @@
+.app {
+  background-color: #f8f9fa;
+}
+
+.hero-section {
+  position: relative;
+  padding: 6rem 0;
+  background: linear-gradient(135deg, rgba(13, 110, 253, 0.9), rgba(111, 66, 193, 0.85));
+  overflow: hidden;
+}
+
+.hero-section .overlay {
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1), transparent 55%),
+    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.08), transparent 60%),
+    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.06), transparent 65%);
+  opacity: 0.8;
+}
+
+.hero-section .container {
+  position: relative;
+}
+
+.hero-section .badge {
+  letter-spacing: 0.08em;
+}
+
+.state-selector {
+  max-width: 640px;
+  border-radius: 1.25rem;
+}
+
+.state-selector .card-body {
+  padding: 1.75rem;
+}
+
+.state-selector .form-select {
+  min-width: 220px;
+}
+
+.card {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 1.5rem 3rem rgba(13, 110, 253, 0.1);
+}
+
+.stat-card {
+  background-color: #ffffff;
+  border-radius: 1rem;
+  padding: 1.75rem;
+  border-left: 4px solid #0d6efd;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #0d6efd;
+}
+
+.checklist-card .card-body {
+  padding: 1.5rem;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 575.98px) {
+  .hero-section {
+    padding: 4.5rem 0;
+  }
+
+  .state-selector .form-select {
+    min-width: 100%;
+  }
+}
