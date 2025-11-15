@@ -1,10 +1,10 @@
-import bikeLaneSign from '../assets/signs/bike-lane.svg'
+import bikeLaneSign from '../assets/signs/bike-lane.jpg'
 import chevronAlignmentSign from '../assets/signs/chevron-alignment.svg'
 import deerCrossingSign from '../assets/signs/deer-crossing.svg'
 import doNotEnterSign from '../assets/signs/do-not-enter.svg'
 import hospitalServiceSign from '../assets/signs/hospital-service.svg'
 import keepRightSign from '../assets/signs/keep-right.svg'
-import mergeLeftSign from '../assets/signs/merge-left.svg'
+import mergeLeftSign from '../assets/signs/merge-left.jpg'
 import narrowBridgeSign from '../assets/signs/narrow-bridge.svg'
 import noParkingSign from '../assets/signs/no-parking.svg'
 import noPassingZoneSign from '../assets/signs/no-passing-zone.svg'
@@ -15,6 +15,7 @@ import roundaboutSign from '../assets/signs/roundabout.svg'
 import schoolCrossingSign from '../assets/signs/school-crossing.svg'
 import signalAheadSign from '../assets/signs/signal-ahead.svg'
 import slipperyWhenWetSign from '../assets/signs/slippery-when-wet.svg'
+import speedLimitSign from '../assets/signs/speed-limit.svg'
 import steepHillSign from '../assets/signs/steep-hill.svg'
 import stopSign from '../assets/signs/stop.svg'
 import truckCrossingSign from '../assets/signs/truck-crossing.svg'
@@ -114,6 +115,10 @@ const ROAD_SIGNS = {
   noPassingZone: {
     image: noPassingZoneSign,
     alt: 'No Passing Zone pennant (MUTCD W14-3)',
+  },
+  speedLimit: {
+    image: speedLimitSign,
+    alt: 'Speed limit regulatory sign (MUTCD R2-1)',
   },
 } as const
 
@@ -816,6 +821,8 @@ export const WA_QUESTIONS: Question[] = [
       'Washington law sets a 50 mph default speed for county roads when no sign is present. Drivers must still slow for conditions such as weather, traffic, and visibility.',
     quote: '"Unless otherwise posted, the maximum speed limit on county roads is 50 mph."',
     reference: 'Washington Driver Guide (2023), Speed Limits',
+  image: ROAD_SIGNS.speedLimit.image,
+  imageAlt: ROAD_SIGNS.speedLimit.alt,
   },
   {
     id: 56,

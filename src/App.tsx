@@ -55,6 +55,7 @@ type PersistedReviewState = {
   queueIds: number[]
   index: number
   revealed: boolean
+  selectedChoice: number | null
   log: ReviewRating[]
 }
 
@@ -218,6 +219,7 @@ function App() {
   const [reviewQueue, setReviewQueue] = useState<Question[]>([])
   const [reviewIndex, setReviewIndex] = useState(0)
   const [reviewRevealed, setReviewRevealed] = useState(false)
+  const [reviewSelectedChoice, setReviewSelectedChoice] = useState<number | null>(null)
   const [reviewLog, setReviewLog] = useState<ReviewRating[]>([])
   const [manualAdjustments, setManualAdjustments] = useState<Record<number, ReviewRating>>({})
   const [sessionId, setSessionId] = useState('')
@@ -290,6 +292,7 @@ function App() {
         const normalizedIndex = Math.min(parsedSession.review.index ?? 0, hydratedQueue.length - 1)
         setReviewIndex(Math.max(0, normalizedIndex))
         setReviewRevealed(parsedSession.review.revealed ?? false)
+        setReviewSelectedChoice(parsedSession.review.selectedChoice ?? null)
         setReviewLog(parsedSession.review.log ?? [])
       }
     }
@@ -503,12 +506,13 @@ function App() {
         }
       : undefined
 
-    const persistedReview: PersistedReviewState | undefined = reviewQueue.length
+        const persistedReview: PersistedReviewState | undefined = reviewQueue.length
       ? {
           status: reviewStatus,
           queueIds: reviewQueue.map((question) => question.id),
           index: Math.min(reviewIndex, Math.max(reviewQueue.length - 1, 0)),
           revealed: reviewRevealed,
+          selectedChoice: reviewSelectedChoice,
           log: reviewLog,
         }
       : undefined
@@ -527,6 +531,7 @@ function App() {
     reviewLog,
     reviewQueue,
     reviewRevealed,
+    reviewSelectedChoice,
     reviewStatus,
     responses,
     sessionId,
@@ -534,6 +539,11 @@ function App() {
     testQuestions,
     testStatus,
   ])
+
+  const resetReviewInteractionState = () => {
+    setReviewRevealed(false)
+    setReviewSelectedChoice(null)
+  }
 
   const handleStartReview = () => {
     if (!reviewQueueCandidates.length) {
@@ -544,12 +554,20 @@ function App() {
     const randomizedQueue = queue.map((question) => shuffleQuestionChoices(question))
     setReviewQueue(randomizedQueue)
     setReviewIndex(0)
-    setReviewRevealed(false)
+    resetReviewInteractionState()
     setReviewStatus('reviewing')
     setReviewLog([])
   }
 
-  const handleRevealReviewAnswer = () => {
+  const handleSelectReviewChoice = (choiceIndex: number) => {
+    if (reviewRevealed) {
+      return
+    }
+    const question = reviewQueue[reviewIndex]
+    if (!question) {
+      return
+    }
+    setReviewSelectedChoice(choiceIndex)
     setReviewRevealed(true)
   }
 
@@ -569,23 +587,23 @@ function App() {
     if (isLastCard) {
       if (rating === 'again') {
         setReviewIndex((previous) => previous + 1)
-        setReviewRevealed(false)
+        resetReviewInteractionState()
         return
       }
       setReviewStatus('complete')
-      setReviewRevealed(false)
+      resetReviewInteractionState()
       return
     }
 
     setReviewIndex((previous) => previous + 1)
-    setReviewRevealed(false)
+    resetReviewInteractionState()
   }
 
   const handleExitReview = () => {
     setReviewStatus('idle')
     setReviewQueue([])
     setReviewIndex(0)
-    setReviewRevealed(false)
+    resetReviewInteractionState()
     setReviewLog([])
   }
 
@@ -1052,27 +1070,44 @@ function App() {
                         <h3 className="h5 fw-semibold mb-3">{reviewInProgressQuestion.prompt}</h3>
                         <div className="list-group mb-4">
                           {reviewInProgressQuestion.choices.map((choice, index) => {
-                            const isCorrect = reviewRevealed && index === reviewInProgressQuestion.answerIndex
-                            const itemClasses = ['list-group-item', 'd-flex', 'justify-content-between', 'align-items-center', 'gap-3']
-                            if (isCorrect) {
+                            const isCorrectChoice = index === reviewInProgressQuestion.answerIndex
+                            const isUserSelection = reviewSelectedChoice === index
+                            const showReveal = reviewRevealed
+                            const itemClasses = [
+                              'list-group-item',
+                              'list-group-item-action',
+                              'd-flex',
+                              'justify-content-between',
+                              'align-items-center',
+                              'gap-3',
+                              'text-start',
+                            ]
+                            if (showReveal && isCorrectChoice) {
                               itemClasses.push('border-success', 'bg-success-subtle')
                             }
+                            if (showReveal && isUserSelection && !isCorrectChoice) {
+                              itemClasses.push('border-danger', 'bg-danger-subtle')
+                            }
                             return (
-                              <div
+                              <button
                                 key={`${reviewInProgressQuestion.id}-${index}`}
+                                type="button"
                                 className={itemClasses.join(' ')}
-                                style={isCorrect ? { borderTopWidth: '1px' } : undefined}
+                                style={showReveal && isCorrectChoice ? { borderTopWidth: '1px' } : undefined}
+                                onClick={() => handleSelectReviewChoice(index)}
+                                disabled={reviewRevealed}
                               >
                                 <span className="text-start">{choice}</span>
-                                {isCorrect && <span className="badge text-bg-success">Correct</span>}
-                              </div>
+                                {showReveal && isCorrectChoice && <span className="badge text-bg-success">Correct</span>}
+                                {showReveal && isUserSelection && !isCorrectChoice && (
+                                  <span className="badge text-bg-danger">Your choice</span>
+                                )}
+                              </button>
                             )
                           })}
                         </div>
                         {!reviewRevealed ? (
-                          <button className="btn btn-primary" type="button" onClick={handleRevealReviewAnswer}>
-                            Reveal Answer
-                          </button>
+                          <p className="text-muted fst-italic">Tap an answer choice to reveal the explanation.</p>
                         ) : (
                           <>
                             <div className="alert alert-info" role="status">
