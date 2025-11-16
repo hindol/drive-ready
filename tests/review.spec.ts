@@ -18,7 +18,7 @@ test.describe('Smart Review experience', () => {
     await page.locator('#review').scrollIntoViewIfNeeded()
     const startButton = page.getByRole('button', { name: 'Start Smart Review' })
     await expect(startButton).toBeEnabled()
-    await startButton.click()
+  await startButton.click()
 
     const cardBadge = page.locator('#review .badge', { hasText: /Card 1 of/ })
     await expect(cardBadge).toBeVisible()
@@ -26,9 +26,9 @@ test.describe('Smart Review experience', () => {
     const firstChoice = page.locator('#review .list-group .list-group-item').first()
     await firstChoice.click()
     const explanationAlert = page.locator('#review .alert-info').first()
-  await expect(explanationAlert).toContainText('Explanation:', { timeout: 10000 })
-  const reviewCard = page.locator('#review .card.border-0.shadow-sm').first()
-  await captureLocatorScreenshot(reviewCard, testInfo, 'smart-review.png')
+    await expect(explanationAlert).toContainText('Explanation:', { timeout: 10000 })
+    const reviewSection = page.locator('#review')
+    await captureLocatorScreenshot(reviewSection, testInfo, 'smart-review.png')
 
     await page.getByRole('button', { name: 'Good' }).click()
     await expect(

@@ -54,3 +54,44 @@ export const captureLocatorScreenshot = async (
     path: resolvePath(filename),
   })
 }
+
+type CombinedScreenshotOptions = {
+  padding?: number
+}
+
+export const captureCombinedScreenshot = async (
+  page: Page,
+  testInfo: TestInfo,
+  filename: string,
+  locators: Locator[],
+  options: CombinedScreenshotOptions = {},
+): Promise<void> => {
+  if (!shouldCapture(testInfo)) {
+    return
+  }
+  const boxes = await Promise.all(locators.map((locator) => locator.boundingBox()))
+  if (boxes.some((box) => !box)) {
+    return
+  }
+  const nonNullBoxes = boxes as Array<NonNullable<(typeof boxes)[number]>>
+  const padding = options.padding ?? 12
+  const minX = Math.max(Math.min(...nonNullBoxes.map((box) => box.x)) - padding, 0)
+  const minY = Math.max(Math.min(...nonNullBoxes.map((box) => box.y)) - padding, 0)
+  const maxX = Math.max(...nonNullBoxes.map((box) => box.x + box.width)) + padding
+  const maxY = Math.max(...nonNullBoxes.map((box) => box.y + box.height)) + padding
+  const viewport = page.viewportSize()
+  const clipWidth = viewport ? Math.min(maxX - minX, viewport.width - minX) : maxX - minX
+  const clipHeight = viewport ? Math.min(maxY - minY, viewport.height - minY) : maxY - minY
+  if (clipWidth <= 0 || clipHeight <= 0) {
+    return
+  }
+  await page.screenshot({
+    path: resolvePath(filename),
+    clip: {
+      x: minX,
+      y: minY,
+      width: clipWidth,
+      height: clipHeight,
+    },
+  })
+}
