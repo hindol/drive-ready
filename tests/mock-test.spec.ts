@@ -1,4 +1,5 @@
-import { expect, test, Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 const getTodayPracticeCount = async (page: Page) => {
   return page.evaluate(() => {

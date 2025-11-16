@@ -1,4 +1,5 @@
-import { expect, test, Page } from '@playwright/test'
+import { expect, test } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
 const getSessionPayload = async (page: Page) => {
   const sessionData = await page.evaluate(() => window.localStorage.getItem('driveready-session-v1'))
