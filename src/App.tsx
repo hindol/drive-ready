@@ -36,12 +36,25 @@ type ReviewCard = {
 
 type ReviewStore = Record<string, Record<number, ReviewCard>>
 
+type PracticeHistory = Record<string, number>
+
+type PracticeCalendarDay = {
+  date: Date
+  key: string
+  questions: number
+  isToday: boolean
+  isPast: boolean
+  isFuture: boolean
+}
+
 const REVIEW_STORAGE_KEY = 'driveready-srs-v1'
 const LEGACY_REVIEW_STORAGE_KEY = 'drivingtestapp-srs-v1'
 const INITIAL_EASE = 2.5
 const MIN_EASE = 1.3
 const SESSION_STORAGE_KEY = 'driveready-session-v1'
 const LEGACY_SESSION_STORAGE_KEY = 'drivingtestapp-session-v1'
+const PRACTICE_GOAL_QUESTIONS = 10
+const PRACTICE_CALENDAR_WINDOW_RADIUS = 3
 
 type PersistedTestState = {
   status: 'idle' | 'in-progress' | 'complete'
@@ -64,6 +77,7 @@ type PersistedSession = {
   stateCode?: SupportedStateCode
   test?: PersistedTestState
   review?: PersistedReviewState
+  practiceHistory?: PracticeHistory
 }
 
 const createSessionId = (): string => {
@@ -203,6 +217,49 @@ const washingtonContent: StateContent = {
 
 const QUESTIONS_PER_ATTEMPT = 10
 
+const getDateKey = (date: Date) => date.toISOString().slice(0, 10)
+
+const buildPracticeCalendar = (history: PracticeHistory): PracticeCalendarDay[] => {
+  const today = getStartOfToday()
+  const todayKey = getDateKey(today)
+  const windowStart = new Date(today)
+  windowStart.setDate(today.getDate() - PRACTICE_CALENDAR_WINDOW_RADIUS)
+
+  return Array.from({ length: PRACTICE_CALENDAR_WINDOW_RADIUS * 2 + 1 }, (_, index) => {
+    const date = new Date(windowStart)
+    date.setDate(windowStart.getDate() + index)
+    date.setHours(0, 0, 0, 0)
+    const key = getDateKey(date)
+    const isPast = date.getTime() < today.getTime()
+    const isFuture = date.getTime() > today.getTime()
+    return {
+      date,
+      key,
+      questions: history[key] ?? 0,
+      isToday: key === todayKey,
+      isPast,
+      isFuture,
+    }
+  })
+}
+
+const computePracticeStreak = (history: PracticeHistory): number => {
+  let streak = 0
+  const cursor = new Date()
+
+  while (streak < 365) {
+    const key = getDateKey(cursor)
+  if ((history[key] ?? 0) >= PRACTICE_GOAL_QUESTIONS) {
+      streak += 1
+      cursor.setDate(cursor.getDate() - 1)
+    } else {
+      break
+    }
+  }
+
+  return streak
+}
+
 function App() {
   const stateCode: SupportedStateCode = ACTIVE_STATE_CODE
   const content = washingtonContent
@@ -220,6 +277,7 @@ function App() {
   const [reviewSelectedChoice, setReviewSelectedChoice] = useState<number | null>(null)
   const [reviewLog, setReviewLog] = useState<ReviewRating[]>([])
   const [manualAdjustments, setManualAdjustments] = useState<Record<number, ReviewRating>>({})
+  const [practiceHistory, setPracticeHistory] = useState<PracticeHistory>({})
   const [sessionId, setSessionId] = useState('')
   const [isHydratingSession, setIsHydratingSession] = useState(true)
   const [isReviewStoreHydrated, setIsReviewStoreHydrated] = useState(false)
@@ -295,8 +353,14 @@ function App() {
       }
     }
 
+    const persistedPracticeHistory =
+      parsedSession.practiceHistory && typeof parsedSession.practiceHistory === 'object'
+        ? parsedSession.practiceHistory
+        : {}
+    setPracticeHistory(persistedPracticeHistory)
+
     setIsHydratingSession(false)
-    const normalizedSession = { ...parsedSession, stateCode: persistedStateCode }
+    const normalizedSession = { ...parsedSession, stateCode: persistedStateCode, practiceHistory: persistedPracticeHistory }
     window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(normalizedSession))
     if (usedLegacySessionKey) {
       window.localStorage.removeItem(LEGACY_SESSION_STORAGE_KEY)
@@ -345,6 +409,19 @@ function App() {
   const progressPercent = totalQuestions === 0 ? 0 : Math.round((answeredCount / totalQuestions) * 100)
   const currentQuestion = testQuestions[currentQuestionIndex]
   const currentReferenceUrl = currentQuestion ? getReferenceLink(currentQuestion.reference) : undefined
+  const todayKey = getDateKey(new Date())
+  const todayQuestionCount = practiceHistory[todayKey] ?? 0
+  const hasMetPracticeGoal = todayQuestionCount >= PRACTICE_GOAL_QUESTIONS
+  const practiceStreak = useMemo(() => computePracticeStreak(practiceHistory), [practiceHistory])
+  const practiceCalendar = useMemo(() => {
+    const days = buildPracticeCalendar(practiceHistory)
+    const completedDays = days.filter((day) => day.questions >= PRACTICE_GOAL_QUESTIONS).length
+    return { days, completedDays, totalDays: days.length }
+  }, [practiceHistory])
+  const todayGoalPercent = Math.min(
+    100,
+    Math.round((Math.min(todayQuestionCount, PRACTICE_GOAL_QUESTIONS) / PRACTICE_GOAL_QUESTIONS) * 100),
+  )
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1
   const hasActiveTest = testStatus !== 'idle' && totalQuestions > 0
   const canAdvance = currentQuestion ? responses[currentQuestion.id] !== undefined : false
@@ -488,6 +565,14 @@ function App() {
     })
   }
 
+  const incrementDailyQuestionProgress = () => {
+    const key = getDateKey(new Date())
+    setPracticeHistory((previous) => {
+      const current = previous[key] ?? 0
+      return { ...previous, [key]: current + 1 }
+    })
+  }
+
   useEffect(() => {
     if (typeof window === 'undefined') {
       return
@@ -504,7 +589,7 @@ function App() {
         }
       : undefined
 
-        const persistedReview: PersistedReviewState | undefined = reviewQueue.length
+    const persistedReview: PersistedReviewState | undefined = reviewQueue.length
       ? {
           status: reviewStatus,
           queueIds: reviewQueue.map((question) => question.id),
@@ -515,16 +600,20 @@ function App() {
         }
       : undefined
 
+    const persistedPracticeHistory = Object.keys(practiceHistory).length ? practiceHistory : undefined
+
     const payload: PersistedSession = {
       id: sessionId,
       stateCode,
       test: persistedTest,
       review: persistedReview,
+      practiceHistory: persistedPracticeHistory,
     }
     window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(payload))
   }, [
     currentQuestionIndex,
     isHydratingSession,
+    practiceHistory,
     reviewIndex,
     reviewLog,
     reviewQueue,
@@ -639,6 +728,7 @@ function App() {
         const rating: ReviewRating = answerIndex === currentQuestion.answerIndex ? 'good' : 'again'
         applyReviewRating(currentQuestion.id, rating)
         setManualAdjustments((prior) => ({ ...prior, [currentQuestion.id]: rating }))
+        incrementDailyQuestionProgress()
       }
       return { ...previous, [currentQuestion.id]: answerIndex }
     })
@@ -665,6 +755,24 @@ function App() {
   const questionAnswers = currentQuestion?.choices ?? []
   const remainingCount = Math.max(totalQuestions - answeredCount, 0)
   const passingPercentage = totalQuestions === 0 ? 0 : Math.round((correctCount / totalQuestions) * 100)
+  const liveScoreMetrics = [
+    {
+      label: 'Answered',
+      value: `${answeredCount} / ${totalQuestions || questionTargetCount}`,
+    },
+    {
+      label: 'Remaining',
+      value: hasActiveTest ? remainingCount : questionTargetCount,
+    },
+    {
+      label: 'Correct',
+      value: hasActiveTest ? correctCount : 0,
+    },
+    {
+      label: 'Score',
+      value: hasActiveTest ? `${passingPercentage}%` : '—',
+    },
+  ]
 
   return (
     <div className="app d-flex flex-column min-vh-100 bg-light">
@@ -790,11 +898,16 @@ function App() {
             ) : (
               <div className="row g-4 align-items-start">
                 <div className="col-lg-4">
-                  <div className="card h-100 border-0 shadow-sm">
-                    <div className="card-body">
-                      <h3 className="h5 fw-semibold mb-3">Live Score</h3>
+                  <div className="card h-100 border-0 shadow-sm live-score-card">
+                    <div className="card-body py-2">
+                      <div className="d-flex align-items-center justify-content-between gap-2 mb-1">
+                        <p className="tiny-label text-muted mb-0">Live Score</p>
+                        <p className="tiny-label text-primary fw-semibold mb-0">
+                          {hasActiveTest ? `${progressPercent}%` : '0%'}
+                        </p>
+                      </div>
                       <div
-                        className="progress mb-3"
+                        className="progress progress-thin mb-2"
                         role="progressbar"
                         aria-valuenow={hasActiveTest ? progressPercent : 0}
                         aria-valuemin={0}
@@ -803,39 +916,86 @@ function App() {
                         <div
                           className={`progress-bar ${progressPercent >= 80 ? 'bg-success' : 'bg-primary'}`}
                           style={{ width: `${hasActiveTest ? progressPercent : 0}%` }}
-                        >
-                          {hasActiveTest ? `${progressPercent}%` : '0%'}
+                        />
+                      </div>
+                      <div className="score-stat-row compact mb-1">
+                        {liveScoreMetrics.map((metric) => (
+                          <div key={metric.label} className="score-stat-chip">
+                            <span className="score-stat-label">{metric.label}</span>
+                            <span className="score-stat-value">{metric.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <p className="tiny-label text-muted mb-0">
+                        Pass goal 80%
+                      </p>
+                    </div>
+                  </div>
+                  <div className="card border-0 shadow-sm mt-4">
+                    <div className="card-body">
+                      <div className="d-flex justify-content-between align-items-start">
+                        <div>
+                          <h3 className="h6 fw-semibold mb-1">Daily 10-question habit</h3>
+                          <p className="text-muted small mb-0">
+                            {practiceStreak
+                              ? `Current streak: ${practiceStreak} day${practiceStreak === 1 ? '' : 's'}`
+                              : 'Solve 10 questions to start your streak.'}
+                          </p>
+                        </div>
+                        <span className={`badge ${hasMetPracticeGoal ? 'text-bg-success' : 'text-bg-primary'} rounded-pill`}>
+                          {hasMetPracticeGoal ? 'Done' : 'In progress'}
+                        </span>
+                      </div>
+                      <div className="mt-3">
+                        <div className="d-flex justify-content-between align-items-center">
+                          <span className="small text-muted">Today</span>
+                          <span className="small fw-semibold">
+                            {Math.min(todayQuestionCount, PRACTICE_GOAL_QUESTIONS)} / {PRACTICE_GOAL_QUESTIONS} questions
+                          </span>
+                        </div>
+                        <div className="progress progress-thin my-2" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={todayGoalPercent}>
+                          <div className="progress-bar bg-primary" style={{ width: `${todayGoalPercent}%` }} />
+                        </div>
+                        <small className="d-block text-muted">
+                          {hasMetPracticeGoal
+                            ? 'We already logged today’s 10 solved questions. Keep the streak alive tomorrow.'
+                            : 'We log it automatically as soon as you answer 10 questions today.'}
+                        </small>
+                      </div>
+                      <div className="practice-calendar mt-2">
+                        <p className="tiny-label text-muted d-flex justify-content-between mb-2">
+                          <span>7-day snapshot</span>
+                          <span className="text-primary fw-semibold">
+                            {practiceCalendar.completedDays}/{practiceCalendar.totalDays}
+                          </span>
+                        </p>
+                        <div className="practice-calendar-grid">
+                          {practiceCalendar.days.map((day) => {
+                            const isMet = day.questions >= PRACTICE_GOAL_QUESTIONS
+                            const dayClasses = ['practice-day']
+                            if (isMet) {
+                              dayClasses.push('practice-day--met')
+                            }
+                            if (day.isToday) {
+                              dayClasses.push('practice-day--today')
+                            }
+                            if (day.isFuture) {
+                              dayClasses.push('practice-day--future')
+                            }
+                            if (day.isPast && !isMet) {
+                              dayClasses.push('practice-day--missed')
+                            }
+                            return (
+                              <span key={day.key} className={dayClasses.join(' ')}>
+                                <span className="practice-day-letter">
+                                  {day.date.toLocaleDateString(undefined, { weekday: 'narrow' })}
+                                </span>
+                                <span className="practice-day-date">{day.date.getDate()}</span>
+                              </span>
+                            )
+                          })}
                         </div>
                       </div>
-                      <ul className="list-unstyled small text-muted mb-4">
-                        <li className="d-flex justify-content-between">
-                          <span>Answered</span>
-                          <span>
-                            {answeredCount} / {totalQuestions || questionTargetCount}
-                          </span>
-                        </li>
-                        <li className="d-flex justify-content-between">
-                          <span>Remaining</span>
-                          <span>{hasActiveTest ? remainingCount : questionTargetCount}</span>
-                        </li>
-                        <li className="d-flex justify-content-between">
-                          <span>Correct</span>
-                          <span>{hasActiveTest ? correctCount : 0}</span>
-                        </li>
-                        <li className="d-flex justify-content-between">
-                          <span>Score</span>
-                          <span>{hasActiveTest ? `${passingPercentage}%` : '—'}</span>
-                        </li>
-                      </ul>
-                      {testStatus === 'complete' ? (
-                        <div className={`alert ${passingPercentage >= 80 ? 'alert-success' : 'alert-warning'} mb-0`} role="status">
-                          {passingPercentage >= 80
-                            ? 'Great job! You are above the 80% passing threshold.'
-                            : "Keep practicing. Aim for at least 80% to match Washington's passing score."}
-                        </div>
-                      ) : (
-                        <p className="small text-muted mb-0">Passing requires at least 80% correct answers.</p>
-                      )}
                     </div>
                   </div>
                 </div>

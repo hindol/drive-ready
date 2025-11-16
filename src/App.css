@@ -55,6 +55,45 @@
   border-left: 4px solid var(--driveready-primary);
 }
 
+.live-score-card .card-body {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.score-stat-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.score-stat-row.compact {
+  gap: 0.4rem;
+}
+
+.score-stat-chip {
+  flex: 1 1 calc(50% - 0.4rem);
+  min-width: 110px;
+  background-color: rgba(22, 106, 156, 0.04);
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.45rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.score-stat-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #6c757d;
+}
+
+.score-stat-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.05;
+}
+
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
@@ -72,6 +111,73 @@
 
 footer a:hover {
   text-decoration: underline;
+}
+
+.practice-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+.progress-thin {
+  height: 0.4rem;
+}
+
+.practice-day {
+  min-height: 42px;
+  border-radius: 0.5rem;
+  border: 1px dashed rgba(22, 106, 156, 0.3);
+  background-color: rgba(22, 106, 156, 0.05);
+  color: var(--driveready-primary-dark);
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  text-align: center;
+  padding: 0.25rem 0.08rem;
+}
+
+.practice-day-letter {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6c757d;
+}
+
+.practice-day-date {
+  font-size: 0.9rem;
+  line-height: 1.1;
+}
+
+.tiny-label {
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.practice-day--met {
+  background-color: var(--driveready-secondary);
+  border-color: var(--driveready-secondary);
+  color: #ffffff;
+  box-shadow: 0 0.75rem 1.5rem rgba(24, 169, 153, 0.25);
+}
+
+.practice-day--missed {
+  opacity: 0.5;
+}
+
+.practice-day--future {
+  border-style: dotted;
+  opacity: 0.7;
+}
+
+.practice-day--today {
+  border-style: solid;
+  border-width: 1px;
+  box-shadow: 0 0 0 2px rgba(22, 106, 156, 0.2) inset;
 }
 
 @media (max-width: 575.98px) {
