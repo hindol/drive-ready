@@ -49,6 +49,8 @@ a {
 }
 
 .btn-primary:active,
+.btn-primary.active,
+.show > .btn-primary.dropdown-toggle,
 .btn-primary:active:focus,
 .btn-primary:active:focus-visible {
   color: #ffffff;
@@ -78,6 +80,8 @@ a {
 }
 
 .btn-outline-primary:active,
+.btn-outline-primary.active,
+.show > .btn-outline-primary.dropdown-toggle,
 .btn-outline-primary:active:focus,
 .btn-outline-primary:active:focus-visible {
   color: #ffffff;

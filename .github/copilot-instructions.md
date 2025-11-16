@@ -43,6 +43,7 @@ When swapping to a new palette, change every place below in the same commit so t
 	- Keep `--driveready-primary-pressed` and `--driveready-focus-ring` in sync with the palette for consistent button active states and focus rings.
 	- Ensure Bootstrap override variables (`--bs-primary`, `--bs-link-color`, etc.) mirror the new tones.
 	- Refresh the `.btn-primary`, `.btn-outline-primary`, `.bg-primary`, `.text-primary`, and `.text-bg-primary` overrides (including hover/active/disabled states and focus rings) if the new palette needs different contrast ratios.
+	- Include `.active`, `.show > .dropdown-toggle`, and `:focus-visible` selectors when updating button colors so touch/toggle states pick up the new palette.
 2. `src/App.css`
 	- Adjust the hero gradient colors, card hover shadow rgba value, stat-card border color, and `.stat-value` text color to use the new palette.
 	- Review any other hard-coded color tokens (e.g., state selector background/box shadow) and align them with the palette.
