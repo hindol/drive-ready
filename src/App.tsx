@@ -1165,6 +1165,27 @@ function App() {
                   Checklist
                 </a>
               </li>
+              <li className="nav-item">
+                <a
+                  className="nav-link d-flex align-items-center justify-content-center"
+                  href="https://github.com/hindol/drive-ready"
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="View DriveReady source on GitHub"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    role="img"
+                    aria-hidden="true"
+                    width="20"
+                    height="20"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2a10 10 0 0 0-3.16 19.49c.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.71-2.5.46-3.03-1.06-3.03-1.06-.45-1.14-1.1-1.45-1.1-1.45-.9-.61.07-.6.07-.6 1 .07 1.53 1.04 1.53 1.04.89 1.52 2.34 1.08 2.91.82.09-.65.35-1.08.63-1.33-1.99-.23-4.09-1-4.09-4.44 0-.98.35-1.78.93-2.41-.09-.23-.4-1.16.09-2.41 0 0 .75-.24 2.45.92a8.47 8.47 0 0 1 4.46 0c1.7-1.16 2.45-.92 2.45-.92.49 1.25.18 2.18.09 2.41.58.63.93 1.43.93 2.41 0 3.45-2.1 4.21-4.11 4.43.36.31.68.92.68 1.86 0 1.34-.01 2.42-.01 2.75 0 .27.18.58.69.48A10 10 0 0 0 12 2Z" />
+                  </svg>
+                </a>
+              </li>
             </ul>
             <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-2 ms-lg-3">
               <SignedOut>
@@ -2079,7 +2100,7 @@ function App() {
             © {new Date().getFullYear()} DriveReady Mock Exams. All rights
             reserved.
           </small>
-          <div className="d-flex gap-3">
+          <div className="d-flex gap-3 align-items-center">
             <a className="text-white text-decoration-none" href="#privacy">
               Privacy
             </a>
