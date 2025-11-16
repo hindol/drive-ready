@@ -12,6 +12,7 @@ DriveReady delivers a Washington-focused mock driving test experience while layi
 ## Features
 
 - **Hero & onboarding** – Washington-first messaging with state stats, hero CTA, and Clerk-powered admin auth (sign-in modal + user avatar on success).
+- **Open-source nav link** – GitHub mark lives next to the other navbar anchors so learners can inspect or contribute to the repository without leaving the flow.
 - **Mock Knowledge Test** – Adaptive question sampler (10-question attempts by default) with live score widget, progress bar, explanation drawer, and instant reference links to the Washington Driver Guide.
 - **Smart Review (SRS)** – Anki-style queue that reorders due, new, and struggling cards; supports four rating buttons (Again/Hard/Good/Easy), explanation reveal, and session summaries with badge counts.
 - **Daily practice habit** – Seven-day calendar snapshot that tracks whether you solved 10 questions each day, highlights today, and shows streak status plus progress bars.
