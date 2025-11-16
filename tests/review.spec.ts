@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import { capturePageScreenshot } from './utils/doc-screenshots'
+import { captureLocatorScreenshot } from './utils/doc-screenshots'
 
 const clearState = async (page: Page) => {
   await page.addInitScript(() => {
@@ -26,8 +26,9 @@ test.describe('Smart Review experience', () => {
     const firstChoice = page.locator('#review .list-group .list-group-item').first()
     await firstChoice.click()
     const explanationAlert = page.locator('#review .alert-info').first()
-    await expect(explanationAlert).toContainText('Explanation:', { timeout: 10000 })
-  await capturePageScreenshot(page, testInfo, 'smart-review.png')
+  await expect(explanationAlert).toContainText('Explanation:', { timeout: 10000 })
+  const reviewCard = page.locator('#review .card.border-0.shadow-sm').first()
+  await captureLocatorScreenshot(reviewCard, testInfo, 'smart-review.png')
 
     await page.getByRole('button', { name: 'Good' }).click()
     await expect(

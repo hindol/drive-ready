@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
-import { captureLocatorScreenshot, capturePageScreenshot } from './utils/doc-screenshots'
+import { captureLocatorScreenshot } from './utils/doc-screenshots'
 
 const getTodayPracticeCount = async (page: Page) => {
   return page.evaluate(() => {
@@ -34,8 +34,9 @@ test.describe('Mock test experience', () => {
 
     const firstChoice = page.locator('.list-group .list-group-item').first()
     await firstChoice.click()
-    await expect(page.locator('.alert-info')).toContainText('Explanation:')
-  await capturePageScreenshot(page, testInfo, 'mock-test-question.png')
+  await expect(page.locator('.alert-info')).toContainText('Explanation:')
+  const mockTestCard = page.locator('#mock-test .card.border-0.shadow-sm').first()
+  await captureLocatorScreenshot(mockTestCard, testInfo, 'mock-test-question.png')
 
     await page.getByRole('button', { name: /Save & Next|Finish Test/ }).click()
     await page.getByRole('button', { name: 'Previous Question' }).click()
