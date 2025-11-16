@@ -10,9 +10,11 @@
   --driveready-primary: #166a9c;
   --driveready-primary-dark: #0f4e73;
   --driveready-primary-soft: #4da8d8;
+  --driveready-primary-pressed: #0b2436;
   --driveready-secondary: #18a999;
   --driveready-accent: #c3f0e7;
   --driveready-primary-muted: #d4eef8;
+  --driveready-focus-ring: rgba(15, 78, 115, 0.3);
   --bs-primary: var(--driveready-primary);
   --bs-primary-rgb: 22, 106, 156;
   --bs-link-color: var(--driveready-primary);
@@ -50,9 +52,9 @@ a {
 .btn-primary:active:focus,
 .btn-primary:active:focus-visible {
   color: #ffffff;
-  background-color: var(--driveready-primary-dark);
-  border-color: var(--driveready-primary-dark);
-  box-shadow: 0 0 0 0.25rem rgba(15, 78, 115, 0.25);
+  background-color: var(--driveready-primary-pressed);
+  border-color: var(--driveready-primary-pressed);
+  box-shadow: 0 0 0 0.2rem var(--driveready-focus-ring);
 }
 
 .btn-primary.disabled,
@@ -79,9 +81,9 @@ a {
 .btn-outline-primary:active:focus,
 .btn-outline-primary:active:focus-visible {
   color: #ffffff;
-  background-color: var(--driveready-primary-dark);
-  border-color: var(--driveready-primary-dark);
-  box-shadow: 0 0 0 0.25rem rgba(15, 78, 115, 0.25);
+  background-color: var(--driveready-primary-pressed);
+  border-color: var(--driveready-primary-pressed);
+  box-shadow: 0 0 0 0.2rem var(--driveready-focus-ring);
 }
 
 .btn-outline-primary.disabled,

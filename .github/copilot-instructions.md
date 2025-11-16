@@ -40,6 +40,7 @@ When swapping to a new palette, change every place below in the same commit so t
 
 1. `src/index.css`
 	- Update all `--driveready-*` CSS custom properties (primary, dark, soft, secondary, accent, muted) under `:root`.
+	- Keep `--driveready-primary-pressed` and `--driveready-focus-ring` in sync with the palette for consistent button active states and focus rings.
 	- Ensure Bootstrap override variables (`--bs-primary`, `--bs-link-color`, etc.) mirror the new tones.
 	- Refresh the `.btn-primary`, `.btn-outline-primary`, `.bg-primary`, `.text-primary`, and `.text-bg-primary` overrides (including hover/active/disabled states and focus rings) if the new palette needs different contrast ratios.
 2. `src/App.css`
