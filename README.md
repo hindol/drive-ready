@@ -9,6 +9,18 @@ DriveReady delivers a Washington-focused mock driving test experience while layi
 - Vite + React + TypeScript
 - Bootstrap 5 for layout and components
 
+## Features
+
+- **Hero & onboarding** – Washington-first messaging with state stats, hero CTA, and Clerk-powered admin auth (sign-in modal + user avatar on success).
+- **Mock Knowledge Test** – Adaptive question sampler (10-question attempts by default) with live score widget, progress bar, explanation drawer, and instant reference links to the Washington Driver Guide.
+- **Smart Review (SRS)** – Anki-style queue that reorders due, new, and struggling cards; supports four rating buttons (Again/Hard/Good/Easy), explanation reveal, and session summaries with badge counts.
+- **Daily practice habit** – Seven-day calendar snapshot that tracks whether you solved 10 questions each day, highlights today, and shows streak status plus progress bars.
+- **Reset progress control** – Call-to-action that wipes session, review, and practice history with a confirmation dialog and descriptive warning copy.
+- **Pre-exam checklist** – Washington-specific preparation list with card styling to mirror DMV requirements.
+- **Responsive theming** – Custom palette layered on Bootstrap overrides (hero gradient, button states, calendar tokens) for consistent branding.
+- **Accessibility considerations** – Semantic Bootstrap components, focus-visible buttons, and alt text for MUTCD sign assets.
+- **UI test coverage** – Playwright test suite exercises hero/nav rendering and the reset modal in Chromium, Firefox, and WebKit through the shared config.
+
 ## Getting Started
 
 ```bash
@@ -30,6 +42,30 @@ The app logs a warning (and still runs) if you rely on the default key, but it w
 - `npm run dev` – start the Vite dev server (append `-- --debug` to surface verbose logging)
 - `npm run build` – create a production build
 - `npm run preview` – preview the production build locally
+- `npm run test:e2e` – run the Playwright UI test suite against a dev server
+- `npm run test:e2e:report` – open the last Playwright HTML report
+
+## UI Testing (Playwright)
+
+Playwright drives real browsers (Chromium, Firefox, and WebKit) against the running Vite dev server.
+
+1. Install the browser binaries once per machine:
+
+```bash
+npx playwright install
+```
+
+2. Run the test suite. The config auto-starts the dev server on port `4173`:
+
+```bash
+npm run test:e2e
+```
+
+3. Optionally inspect traces, screenshots, and videos via the HTML report:
+
+```bash
+npm run test:e2e:report
+```
 
 ## Mock Exam Experience
 
