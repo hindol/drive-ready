@@ -73,6 +73,7 @@ type PersistedTestState = {
   currentQuestionIndex: number
   responses: Record<number, number>
   questionExposure?: Record<number, number>
+  presentedQuestions?: Question[]
 }
 
 type PersistedReviewState = {
@@ -415,11 +416,21 @@ function App() {
       questionMap.set(question.id, question)
     })
 
-    if (parsedSession.test && parsedSession.test.questionIds?.length) {
-      const hydratedQuestions = parsedSession.test.questionIds
-        .map((id) => questionMap.get(id))
-        .filter((question): question is Question => Boolean(question))
-      if (hydratedQuestions.length) {
+    if (parsedSession.test) {
+      let hydratedQuestions: Question[] | undefined
+      if (parsedSession.test.presentedQuestions?.length) {
+        hydratedQuestions = parsedSession.test.presentedQuestions
+      } else if (parsedSession.test.questionIds?.length) {
+        const rebuiltQuestions = parsedSession.test.questionIds
+          .map((id) => questionMap.get(id))
+          .filter((question): question is Question => Boolean(question))
+        if (rebuiltQuestions.length) {
+          hydratedQuestions = rebuiltQuestions
+          parsedSession.test.presentedQuestions = rebuiltQuestions
+        }
+      }
+
+      if (hydratedQuestions?.length) {
         setTestQuestions(hydratedQuestions)
         setTestStatus(parsedSession.test.status ?? 'idle')
         const normalizedIndex = Math.min(
@@ -841,6 +852,7 @@ function App() {
           ),
           responses,
           questionExposure: questionExposureCounts,
+          presentedQuestions: testQuestions,
         }
       : undefined
 

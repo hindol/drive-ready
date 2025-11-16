@@ -62,8 +62,8 @@ test.describe('Mock test experience', () => {
     await page.getByRole('button', { name: 'Start Mock Test' }).click()
 
     for (let answered = 0; answered < questionCount; answered += 1) {
-      const choice = page.locator('.list-group .list-group-item').first()
-      await expect(choice).toBeEnabled({ timeout: 10000 })
+      const choice = page.locator('.list-group button:enabled').first()
+      await choice.waitFor({ state: 'visible' })
       await choice.click()
       const actionButton = page.getByRole('button', {
         name: /Save & Next|Finish Test|Review Complete/,

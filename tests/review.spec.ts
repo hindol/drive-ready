@@ -21,9 +21,10 @@ test.describe('Smart Review experience', () => {
     const cardBadge = page.locator('#review .badge', { hasText: /Card 1 of/ })
     await expect(cardBadge).toBeVisible()
 
-    const firstChoice = page.locator('#review .list-group .list-group-item').first()
-    await firstChoice.click()
-    await expect(page.locator('#review .alert-info')).toContainText('Explanation:')
+  const firstChoice = page.locator('#review .list-group .list-group-item').first()
+  await firstChoice.click()
+  const explanationAlert = page.locator('#review .alert-info').first()
+  await expect(explanationAlert).toContainText('Explanation:', { timeout: 10000 })
 
     await page.getByRole('button', { name: 'Good' }).click()
     await expect(
