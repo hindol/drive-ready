@@ -2,7 +2,13 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Question } from './data/questions'
 import { questionBank, getReferenceLink } from './data/questions'
 import './App.css'
-import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton } from '@clerk/clerk-react'
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignOutButton,
+  UserButton,
+} from '@clerk/clerk-react'
 
 type Stat = {
   label: string
@@ -64,6 +70,7 @@ type PersistedTestState = {
   questionIds: number[]
   currentQuestionIndex: number
   responses: Record<number, number>
+  questionExposure?: Record<number, number>
 }
 
 type PersistedReviewState = {
@@ -84,17 +91,21 @@ type PersistedSession = {
 }
 
 const createSessionId = (): string => {
-  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+  if (
+    typeof crypto !== 'undefined' &&
+    typeof crypto.randomUUID === 'function'
+  ) {
     return crypto.randomUUID()
   }
   return `session-${Math.random().toString(36).slice(2, 10)}`
 }
-const ratingLabels: Record<ReviewRating, { label: string; className: string }> = {
-  again: { label: 'Again', className: 'text-bg-danger' },
-  hard: { label: 'Hard', className: 'text-bg-warning' },
-  good: { label: 'Good', className: 'text-bg-primary' },
-  easy: { label: 'Easy', className: 'text-bg-success' },
-}
+const ratingLabels: Record<ReviewRating, { label: string; className: string }> =
+  {
+    again: { label: 'Again', className: 'text-bg-danger' },
+    hard: { label: 'Hard', className: 'text-bg-warning' },
+    good: { label: 'Good', className: 'text-bg-primary' },
+    easy: { label: 'Easy', className: 'text-bg-success' },
+  }
 
 const getStartOfToday = (): Date => {
   const date = new Date()
@@ -125,7 +136,10 @@ const computeNextReviewCard = (
       ease = Math.max(MIN_EASE, ease - 0.2)
       break
     case 'hard':
-      nextInterval = Math.max(1, lastInterval === 0 ? 1 : Math.round(lastInterval * 1.2))
+      nextInterval = Math.max(
+        1,
+        lastInterval === 0 ? 1 : Math.round(lastInterval * 1.2),
+      )
       ease = Math.max(MIN_EASE, ease - 0.15)
       break
     case 'good':
@@ -138,7 +152,10 @@ const computeNextReviewCard = (
       }
       break
     case 'easy':
-      nextInterval = lastInterval === 0 ? 4 : Math.max(1, Math.round(lastInterval * ease * 1.3))
+      nextInterval =
+        lastInterval === 0
+          ? 4
+          : Math.max(1, Math.round(lastInterval * ease * 1.3))
       ease = Math.min(2.8, ease + 0.15)
       break
     default:
@@ -168,8 +185,8 @@ const shuffleQuestions = <T,>(items: T[], count: number): T[] => {
   return copy.slice(0, count)
 }
 
-const shuffleAll = <T,>(items: T[]): T[] => shuffleQuestions(items, items.length)
-
+const shuffleAll = <T,>(items: T[]): T[] =>
+  shuffleQuestions(items, items.length)
 
 const shuffleQuestionChoices = (question: Question): Question => {
   const choiceCount = question.choices.length
@@ -180,10 +197,15 @@ const shuffleQuestionChoices = (question: Question): Question => {
   const indices = question.choices.map((_, index) => index)
   for (let position = indices.length - 1; position > 0; position -= 1) {
     const swapWith = Math.floor(Math.random() * (position + 1))
-    ;[indices[position], indices[swapWith]] = [indices[swapWith], indices[position]]
+    ;[indices[position], indices[swapWith]] = [
+      indices[swapWith],
+      indices[position],
+    ]
   }
 
-  const shuffledChoices = indices.map((originalIndex) => question.choices[originalIndex])
+  const shuffledChoices = indices.map(
+    (originalIndex) => question.choices[originalIndex],
+  )
   const shuffledAnswerIndex = indices.indexOf(question.answerIndex)
 
   return {
@@ -192,7 +214,6 @@ const shuffleQuestionChoices = (question: Question): Question => {
     answerIndex: shuffledAnswerIndex,
   }
 }
-
 
 const ACTIVE_STATE_CODE: SupportedStateCode = 'WA'
 
@@ -211,7 +232,7 @@ const washingtonContent: StateContent = {
   checklist: [
     'Bring photo ID, proof of Washington residency, and your driver training certificate.',
     'Practice parallel parking, hill starts, and backing around a corner before exam day.',
-  'Plan to arrive 15 minutes early at your testing location to complete paperwork.',
+    'Plan to arrive 15 minutes early at your testing location to complete paperwork.',
     'Review Right of Way rules for four-way stops and flashing yellow arrows.',
     'Confirm that your testing vehicle meets safety requirements and has valid insurance.',
   ],
@@ -222,28 +243,33 @@ const QUESTIONS_PER_ATTEMPT = 10
 
 const getDateKey = (date: Date) => date.toISOString().slice(0, 10)
 
-const buildPracticeCalendar = (history: PracticeHistory): PracticeCalendarDay[] => {
+const buildPracticeCalendar = (
+  history: PracticeHistory,
+): PracticeCalendarDay[] => {
   const today = getStartOfToday()
   const todayKey = getDateKey(today)
   const windowStart = new Date(today)
   windowStart.setDate(today.getDate() - PRACTICE_CALENDAR_WINDOW_RADIUS)
 
-  return Array.from({ length: PRACTICE_CALENDAR_WINDOW_RADIUS * 2 + 1 }, (_, index) => {
-    const date = new Date(windowStart)
-    date.setDate(windowStart.getDate() + index)
-    date.setHours(0, 0, 0, 0)
-    const key = getDateKey(date)
-    const isPast = date.getTime() < today.getTime()
-    const isFuture = date.getTime() > today.getTime()
-    return {
-      date,
-      key,
-      questions: history[key] ?? 0,
-      isToday: key === todayKey,
-      isPast,
-      isFuture,
-    }
-  })
+  return Array.from(
+    { length: PRACTICE_CALENDAR_WINDOW_RADIUS * 2 + 1 },
+    (_, index) => {
+      const date = new Date(windowStart)
+      date.setDate(windowStart.getDate() + index)
+      date.setHours(0, 0, 0, 0)
+      const key = getDateKey(date)
+      const isPast = date.getTime() < today.getTime()
+      const isFuture = date.getTime() > today.getTime()
+      return {
+        date,
+        key,
+        questions: history[key] ?? 0,
+        isToday: key === todayKey,
+        isPast,
+        isFuture,
+      }
+    },
+  )
 }
 
 const computePracticeStreak = (history: PracticeHistory): number => {
@@ -252,7 +278,7 @@ const computePracticeStreak = (history: PracticeHistory): number => {
 
   while (streak < 365) {
     const key = getDateKey(cursor)
-  if ((history[key] ?? 0) >= PRACTICE_GOAL_QUESTIONS) {
+    if ((history[key] ?? 0) >= PRACTICE_GOAL_QUESTIONS) {
       streak += 1
       cursor.setDate(cursor.getDate() - 1)
     } else {
@@ -266,25 +292,42 @@ const computePracticeStreak = (history: PracticeHistory): number => {
 function App() {
   const stateCode: SupportedStateCode = ACTIVE_STATE_CODE
   const content = washingtonContent
-  const activeQuestionBank = useMemo(() => questionBank[stateCode] ?? [], [stateCode])
-  const questionTargetCount = activeQuestionBank.length ? Math.min(QUESTIONS_PER_ATTEMPT, activeQuestionBank.length) : 0
-  const [testStatus, setTestStatus] = useState<'idle' | 'in-progress' | 'complete'>('idle')
+  const activeQuestionBank = useMemo(
+    () => questionBank[stateCode] ?? [],
+    [stateCode],
+  )
+  const questionTargetCount = activeQuestionBank.length
+    ? Math.min(QUESTIONS_PER_ATTEMPT, activeQuestionBank.length)
+    : 0
+  const [testStatus, setTestStatus] = useState<
+    'idle' | 'in-progress' | 'complete'
+  >('idle')
   const [testQuestions, setTestQuestions] = useState<Question[]>([])
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [responses, setResponses] = useState<Record<Question['id'], number>>({})
+  const [questionExposureCounts, setQuestionExposureCounts] = useState<
+    Record<number, number>
+  >({})
   const [reviewStore, setReviewStore] = useState<ReviewStore>({})
-  const [reviewStatus, setReviewStatus] = useState<'idle' | 'reviewing' | 'complete'>('idle')
+  const [reviewStatus, setReviewStatus] = useState<
+    'idle' | 'reviewing' | 'complete'
+  >('idle')
   const [reviewQueue, setReviewQueue] = useState<Question[]>([])
   const [reviewIndex, setReviewIndex] = useState(0)
   const [reviewRevealed, setReviewRevealed] = useState(false)
-  const [reviewSelectedChoice, setReviewSelectedChoice] = useState<number | null>(null)
+  const [reviewSelectedChoice, setReviewSelectedChoice] = useState<
+    number | null
+  >(null)
   const [reviewLog, setReviewLog] = useState<ReviewRating[]>([])
-  const [manualAdjustments, setManualAdjustments] = useState<Record<number, ReviewRating>>({})
+  const [manualAdjustments, setManualAdjustments] = useState<
+    Record<number, ReviewRating>
+  >({})
   const [practiceHistory, setPracticeHistory] = useState<PracticeHistory>({})
   const [sessionId, setSessionId] = useState('')
   const [isHydratingSession, setIsHydratingSession] = useState(true)
   const [isReviewStoreHydrated, setIsReviewStoreHydrated] = useState(false)
-  const [isPracticeHistoryHydrated, setIsPracticeHistoryHydrated] = useState(false)
+  const [isPracticeHistoryHydrated, setIsPracticeHistoryHydrated] =
+    useState(false)
   const [showResetDialog, setShowResetDialog] = useState(false)
   const [isResettingProgress, setIsResettingProgress] = useState(false)
 
@@ -332,9 +375,14 @@ function App() {
       if (hydratedQuestions.length) {
         setTestQuestions(hydratedQuestions)
         setTestStatus(parsedSession.test.status ?? 'idle')
-        const normalizedIndex = Math.min(parsedSession.test.currentQuestionIndex ?? 0, hydratedQuestions.length - 1)
+        const normalizedIndex = Math.min(
+          parsedSession.test.currentQuestionIndex ?? 0,
+          hydratedQuestions.length - 1,
+        )
         setCurrentQuestionIndex(Math.max(0, normalizedIndex))
-        const filteredResponses = Object.entries(parsedSession.test.responses ?? {}).reduce<Record<number, number>>((acc, [key, value]) => {
+        const filteredResponses = Object.entries(
+          parsedSession.test.responses ?? {},
+        ).reduce<Record<number, number>>((acc, [key, value]) => {
           const numericKey = Number(key)
           if (questionMap.has(numericKey)) {
             acc[numericKey] = value as number
@@ -342,6 +390,16 @@ function App() {
           return acc
         }, {})
         setResponses(filteredResponses)
+        const hydratedExposure = Object.entries(
+          parsedSession.test.questionExposure ?? {},
+        ).reduce<Record<number, number>>((acc, [key, value]) => {
+          const numericKey = Number(key)
+          if (questionMap.has(numericKey)) {
+            acc[numericKey] = value as number
+          }
+          return acc
+        }, {})
+        setQuestionExposureCounts(hydratedExposure)
       }
     }
 
@@ -352,7 +410,10 @@ function App() {
       if (hydratedQueue.length) {
         setReviewQueue(hydratedQueue)
         setReviewStatus(parsedSession.review.status ?? 'idle')
-        const normalizedIndex = Math.min(parsedSession.review.index ?? 0, hydratedQueue.length - 1)
+        const normalizedIndex = Math.min(
+          parsedSession.review.index ?? 0,
+          hydratedQueue.length - 1,
+        )
         setReviewIndex(Math.max(0, normalizedIndex))
         setReviewRevealed(parsedSession.review.revealed ?? false)
         setReviewSelectedChoice(parsedSession.review.selectedChoice ?? null)
@@ -360,10 +421,14 @@ function App() {
       }
     }
 
-    let storedPracticeHistory = window.localStorage.getItem(PRACTICE_HISTORY_STORAGE_KEY)
+    let storedPracticeHistory = window.localStorage.getItem(
+      PRACTICE_HISTORY_STORAGE_KEY,
+    )
     let usedLegacyPracticeHistoryKey = false
     if (!storedPracticeHistory) {
-      storedPracticeHistory = window.localStorage.getItem(LEGACY_PRACTICE_HISTORY_STORAGE_KEY)
+      storedPracticeHistory = window.localStorage.getItem(
+        LEGACY_PRACTICE_HISTORY_STORAGE_KEY,
+      )
       if (storedPracticeHistory) {
         usedLegacyPracticeHistoryKey = true
       }
@@ -375,7 +440,10 @@ function App() {
         if (parsed && typeof parsed === 'object') {
           dedicatedPracticeHistory = parsed
           if (usedLegacyPracticeHistoryKey) {
-            window.localStorage.setItem(PRACTICE_HISTORY_STORAGE_KEY, JSON.stringify(parsed))
+            window.localStorage.setItem(
+              PRACTICE_HISTORY_STORAGE_KEY,
+              JSON.stringify(parsed),
+            )
             window.localStorage.removeItem(LEGACY_PRACTICE_HISTORY_STORAGE_KEY)
           }
         }
@@ -385,10 +453,14 @@ function App() {
       }
     }
     const persistedPracticeHistory =
-      parsedSession.practiceHistory && typeof parsedSession.practiceHistory === 'object'
+      parsedSession.practiceHistory &&
+      typeof parsedSession.practiceHistory === 'object'
         ? parsedSession.practiceHistory
         : {}
-    const mergedPracticeHistory = { ...persistedPracticeHistory, ...dedicatedPracticeHistory }
+    const mergedPracticeHistory = {
+      ...persistedPracticeHistory,
+      ...dedicatedPracticeHistory,
+    }
     setPracticeHistory((previous) => {
       if (!Object.keys(previous).length) {
         return mergedPracticeHistory
@@ -398,8 +470,15 @@ function App() {
     setIsPracticeHistoryHydrated(true)
 
     setIsHydratingSession(false)
-    const normalizedSession = { ...parsedSession, stateCode: persistedStateCode, practiceHistory: mergedPracticeHistory }
-    window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(normalizedSession))
+    const normalizedSession = {
+      ...parsedSession,
+      stateCode: persistedStateCode,
+      practiceHistory: mergedPracticeHistory,
+    }
+    window.localStorage.setItem(
+      SESSION_STORAGE_KEY,
+      JSON.stringify(normalizedSession),
+    )
     if (usedLegacySessionKey) {
       window.localStorage.removeItem(LEGACY_SESSION_STORAGE_KEY)
     }
@@ -413,7 +492,10 @@ function App() {
       window.localStorage.removeItem(PRACTICE_HISTORY_STORAGE_KEY)
       return
     }
-    window.localStorage.setItem(PRACTICE_HISTORY_STORAGE_KEY, JSON.stringify(practiceHistory))
+    window.localStorage.setItem(
+      PRACTICE_HISTORY_STORAGE_KEY,
+      JSON.stringify(practiceHistory),
+    )
   }, [practiceHistory, isPracticeHistoryHydrated])
 
   useEffect(() => {
@@ -458,30 +540,59 @@ function App() {
 
   const totalQuestions = testQuestions.length
   const answeredCount = Object.keys(responses).length
-  const correctCount = testQuestions.filter((question) => responses[question.id] === question.answerIndex).length
-  const progressPercent = totalQuestions === 0 ? 0 : Math.round((answeredCount / totalQuestions) * 100)
+  const correctCount = testQuestions.filter(
+    (question) => responses[question.id] === question.answerIndex,
+  ).length
+  const progressPercent =
+    totalQuestions === 0
+      ? 0
+      : Math.round((answeredCount / totalQuestions) * 100)
   const currentQuestion = testQuestions[currentQuestionIndex]
-  const currentReferenceUrl = currentQuestion ? getReferenceLink(currentQuestion.reference) : undefined
+  const currentQuestionId = currentQuestion?.id
+  const currentReferenceUrl = currentQuestion
+    ? getReferenceLink(currentQuestion.reference)
+    : undefined
   const todayKey = getDateKey(new Date())
   const todayQuestionCount = practiceHistory[todayKey] ?? 0
   const hasMetPracticeGoal = todayQuestionCount >= PRACTICE_GOAL_QUESTIONS
-  const practiceStreak = useMemo(() => computePracticeStreak(practiceHistory), [practiceHistory])
+  const practiceStreak = useMemo(
+    () => computePracticeStreak(practiceHistory),
+    [practiceHistory],
+  )
   const practiceCalendar = useMemo(() => {
     const days = buildPracticeCalendar(practiceHistory)
-    const completedDays = days.filter((day) => day.questions >= PRACTICE_GOAL_QUESTIONS).length
+    const completedDays = days.filter(
+      (day) => day.questions >= PRACTICE_GOAL_QUESTIONS,
+    ).length
     return { days, completedDays, totalDays: days.length }
   }, [practiceHistory])
-  const isPracticeCalendarHydrating = isHydratingSession || !isPracticeHistoryHydrated
+  const isPracticeCalendarHydrating =
+    isHydratingSession || !isPracticeHistoryHydrated
   const todayGoalPercent = Math.min(
     100,
-    Math.round((Math.min(todayQuestionCount, PRACTICE_GOAL_QUESTIONS) / PRACTICE_GOAL_QUESTIONS) * 100),
+    Math.round(
+      (Math.min(todayQuestionCount, PRACTICE_GOAL_QUESTIONS) /
+        PRACTICE_GOAL_QUESTIONS) *
+        100,
+    ),
   )
   const isLastQuestion = currentQuestionIndex === totalQuestions - 1
   const hasActiveTest = testStatus !== 'idle' && totalQuestions > 0
-  const canAdvance = currentQuestion ? responses[currentQuestion.id] !== undefined : false
-  const canNavigateForward = testStatus === 'complete' ? !isLastQuestion : canAdvance
-  const selectedAnswerIndex = currentQuestion ? responses[currentQuestion.id] : undefined
-  const activeReviewData = useMemo(() => reviewStore[stateCode] ?? EMPTY_REVIEW_DATA, [reviewStore, stateCode])
+  const canAdvance = currentQuestion
+    ? responses[currentQuestion.id] !== undefined
+    : false
+  const canNavigateForward =
+    testStatus === 'complete' ? !isLastQuestion : canAdvance
+  const selectedAnswerIndex = currentQuestion
+    ? responses[currentQuestion.id]
+    : undefined
+  const hasSeenCurrentQuestionBefore = currentQuestionId
+    ? (questionExposureCounts[currentQuestionId] ?? 0) > 1
+    : false
+  const activeReviewData = useMemo(
+    () => reviewStore[stateCode] ?? EMPTY_REVIEW_DATA,
+    [reviewStore, stateCode],
+  )
   const dueQuestions = useMemo(() => {
     const todayTime = getStartOfToday().getTime()
     const dueList: { question: Question; dueTime: number }[] = []
@@ -507,7 +618,8 @@ function App() {
   }, [activeQuestionBank, activeReviewData])
 
   const newQuestions = useMemo(
-    () => activeQuestionBank.filter((question) => !activeReviewData[question.id]),
+    () =>
+      activeQuestionBank.filter((question) => !activeReviewData[question.id]),
     [activeQuestionBank, activeReviewData],
   )
 
@@ -545,7 +657,10 @@ function App() {
     if (!nextDueDate) {
       return 'All caught up'
     }
-    return nextDueDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
+    return nextDueDate.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    })
   }, [nextDueDate])
 
   const reviewQueueCandidates = useMemo(() => {
@@ -566,15 +681,26 @@ function App() {
   const reviewReadyCount = reviewQueueCandidates.length
   const dueTodayCount = dueQuestions.length
   const newCardCount = newQuestions.length
-  const dueQuestionIdSet = useMemo(() => new Set(dueQuestions.map((question) => question.id)), [dueQuestions])
-  const newQuestionIdSet = useMemo(() => new Set(newQuestions.map((question) => question.id)), [newQuestions])
+  const dueQuestionIdSet = useMemo(
+    () => new Set(dueQuestions.map((question) => question.id)),
+    [dueQuestions],
+  )
+  const newQuestionIdSet = useMemo(
+    () => new Set(newQuestions.map((question) => question.id)),
+    [newQuestions],
+  )
   const reviewInProgressQuestion = reviewQueue[reviewIndex]
-  const reviewReferenceUrl = reviewInProgressQuestion ? getReferenceLink(reviewInProgressQuestion.reference) : undefined
+  const reviewReferenceUrl = reviewInProgressQuestion
+    ? getReferenceLink(reviewInProgressQuestion.reference)
+    : undefined
   const ratingSummary = useMemo(() => {
-    return reviewLog.reduce<Record<ReviewRating, number>>((summary, rating) => {
-      summary[rating] = (summary[rating] ?? 0) + 1
-      return summary
-    }, {} as Record<ReviewRating, number>)
+    return reviewLog.reduce<Record<ReviewRating, number>>(
+      (summary, rating) => {
+        summary[rating] = (summary[rating] ?? 0) + 1
+        return summary
+      },
+      {} as Record<ReviewRating, number>,
+    )
   }, [reviewLog])
 
   const buildAdaptivePool = useCallback((): Question[] => {
@@ -587,7 +713,10 @@ function App() {
         return false
       }
       const dueTime = new Date(card.due).getTime()
-      const dueSoon = !Number.isNaN(dueTime) && dueTime > todayTime && dueTime - todayTime <= 3 * 24 * 60 * 60 * 1000
+      const dueSoon =
+        !Number.isNaN(dueTime) &&
+        dueTime > todayTime &&
+        dueTime - todayTime <= 3 * 24 * 60 * 60 * 1000
       const needsHelp = card.ease <= MIN_EASE + 0.2 || card.streak <= 1
       if (dueSoon || needsHelp) {
         strugglingSet.add(question.id)
@@ -596,9 +725,17 @@ function App() {
       return false
     })
     const laterQuestions = activeQuestionBank.filter(
-      (question) => !dueQuestionIdSet.has(question.id) && !strugglingSet.has(question.id) && !newQuestionIdSet.has(question.id),
+      (question) =>
+        !dueQuestionIdSet.has(question.id) &&
+        !strugglingSet.has(question.id) &&
+        !newQuestionIdSet.has(question.id),
     )
-    const buckets = [shuffleAll(dueQuestions), shuffleAll(strugglingQuestions), shuffleAll(newQuestions), shuffleAll(laterQuestions)]
+    const buckets = [
+      shuffleAll(dueQuestions),
+      shuffleAll(strugglingQuestions),
+      shuffleAll(newQuestions),
+      shuffleAll(laterQuestions),
+    ]
     const merged: Question[] = []
     buckets.forEach((bucket) => {
       bucket.forEach((question) => {
@@ -609,13 +746,27 @@ function App() {
       })
     })
     return merged
-  }, [activeQuestionBank, activeReviewData, dueQuestionIdSet, newQuestionIdSet, dueQuestions, newQuestions])
+  }, [
+    activeQuestionBank,
+    activeReviewData,
+    dueQuestionIdSet,
+    newQuestionIdSet,
+    dueQuestions,
+    newQuestions,
+  ])
 
   const applyReviewRating = (questionId: number, rating: ReviewRating) => {
     setReviewStore((previous) => {
       const stateRecords = previous[stateCode] ? { ...previous[stateCode] } : {}
-      const updatedCard = computeNextReviewCard(questionId, stateRecords[questionId], rating)
-      return { ...previous, [stateCode]: { ...stateRecords, [questionId]: updatedCard } }
+      const updatedCard = computeNextReviewCard(
+        questionId,
+        stateRecords[questionId],
+        rating,
+      )
+      return {
+        ...previous,
+        [stateCode]: { ...stateRecords, [questionId]: updatedCard },
+      }
     })
   }
 
@@ -638,8 +789,12 @@ function App() {
       ? {
           status: testStatus,
           questionIds: testQuestions.map((question) => question.id),
-          currentQuestionIndex: Math.min(currentQuestionIndex, Math.max(testQuestions.length - 1, 0)),
+          currentQuestionIndex: Math.min(
+            currentQuestionIndex,
+            Math.max(testQuestions.length - 1, 0),
+          ),
           responses,
+          questionExposure: questionExposureCounts,
         }
       : undefined
 
@@ -654,7 +809,9 @@ function App() {
         }
       : undefined
 
-    const persistedPracticeHistory = Object.keys(practiceHistory).length ? practiceHistory : undefined
+    const persistedPracticeHistory = Object.keys(practiceHistory).length
+      ? practiceHistory
+      : undefined
 
     const payload: PersistedSession = {
       id: sessionId,
@@ -675,6 +832,7 @@ function App() {
     reviewSelectedChoice,
     reviewStatus,
     responses,
+    questionExposureCounts,
     sessionId,
     stateCode,
     testQuestions,
@@ -692,7 +850,9 @@ function App() {
     }
     const limit = 15
     const queue = reviewQueueCandidates.slice(0, limit)
-    const randomizedQueue = queue.map((question) => shuffleQuestionChoices(question))
+    const randomizedQueue = queue.map((question) =>
+      shuffleQuestionChoices(question),
+    )
     setReviewQueue(randomizedQueue)
     setReviewIndex(0)
     resetReviewInteractionState()
@@ -722,7 +882,10 @@ function App() {
 
     const isLastCard = reviewIndex === reviewQueue.length - 1
     if (rating === 'again') {
-      setReviewQueue((previousQueue) => [...previousQueue, shuffleQuestionChoices(question)])
+      setReviewQueue((previousQueue) => [
+        ...previousQueue,
+        shuffleQuestionChoices(question),
+      ])
     }
 
     if (isLastCard) {
@@ -748,6 +911,16 @@ function App() {
     setReviewLog([])
   }
 
+  useEffect(() => {
+    if (!currentQuestionId || !hasActiveTest) {
+      return
+    }
+    setQuestionExposureCounts((previous) => {
+      const previousCount = previous[currentQuestionId] ?? 0
+      return { ...previous, [currentQuestionId]: previousCount + 1 }
+    })
+  }, [currentQuestionId, hasActiveTest])
+
   const handleStartTest = () => {
     if (!activeQuestionBank.length) {
       return
@@ -756,14 +929,18 @@ function App() {
     const adaptivePool = buildAdaptivePool()
     let selection = adaptivePool.slice(0, sampleCount)
     if (selection.length < sampleCount) {
-      const fallback = shuffleQuestions(activeQuestionBank, activeQuestionBank.length).filter(
-        (question) => !selection.some((item) => item.id === question.id),
-      )
+      const fallback = shuffleQuestions(
+        activeQuestionBank,
+        activeQuestionBank.length,
+      ).filter((question) => !selection.some((item) => item.id === question.id))
       selection = [...selection, ...fallback].slice(0, sampleCount)
     }
-    const randomizedSample = selection.map((question) => shuffleQuestionChoices(question))
+    const randomizedSample = selection.map((question) =>
+      shuffleQuestionChoices(question),
+    )
     setTestQuestions(randomizedSample)
     setResponses({})
+    setQuestionExposureCounts({})
     setCurrentQuestionIndex(0)
     setTestStatus('in-progress')
     setManualAdjustments({})
@@ -774,14 +951,22 @@ function App() {
   }
 
   const handleSelectOption = (answerIndex: number) => {
-    if (!currentQuestion || testStatus === 'complete' || selectedAnswerIndex !== undefined) {
+    if (
+      !currentQuestion ||
+      testStatus === 'complete' ||
+      selectedAnswerIndex !== undefined
+    ) {
       return
     }
     setResponses((previous) => {
       if (previous[currentQuestion.id] === undefined) {
-        const rating: ReviewRating = answerIndex === currentQuestion.answerIndex ? 'good' : 'again'
+        const rating: ReviewRating =
+          answerIndex === currentQuestion.answerIndex ? 'good' : 'again'
         applyReviewRating(currentQuestion.id, rating)
-        setManualAdjustments((prior) => ({ ...prior, [currentQuestion.id]: rating }))
+        setManualAdjustments((prior) => ({
+          ...prior,
+          [currentQuestion.id]: rating,
+        }))
         incrementDailyQuestionProgress()
       }
       return { ...previous, [currentQuestion.id]: answerIndex }
@@ -848,6 +1033,7 @@ function App() {
       setManualAdjustments({})
       setReviewStore({})
       setPracticeHistory({})
+      setQuestionExposureCounts({})
       setSessionId(createSessionId())
       setShowResetDialog(false)
     } finally {
@@ -857,7 +1043,8 @@ function App() {
 
   const questionAnswers = currentQuestion?.choices ?? []
   const remainingCount = Math.max(totalQuestions - answeredCount, 0)
-  const passingPercentage = totalQuestions === 0 ? 0 : Math.round((correctCount / totalQuestions) * 100)
+  const passingPercentage =
+    totalQuestions === 0 ? 0 : Math.round((correctCount / totalQuestions) * 100)
   const liveScoreMetrics = [
     {
       label: 'Answered',
@@ -898,7 +1085,11 @@ function App() {
           <div className="collapse navbar-collapse" id="mainNav">
             <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
               <li className="nav-item">
-                <a className="nav-link active" aria-current="page" href="#overview">
+                <a
+                  className="nav-link active"
+                  aria-current="page"
+                  href="#overview"
+                >
                   Overview
                 </a>
               </li>
@@ -921,7 +1112,10 @@ function App() {
             <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-2 ms-lg-3">
               <SignedOut>
                 <SignInButton mode="modal">
-                  <button className="btn btn-light text-primary border-0 shadow-sm fw-semibold w-100 w-lg-auto" type="button">
+                  <button
+                    className="btn btn-light text-primary border-0 shadow-sm fw-semibold w-100 w-lg-auto"
+                    type="button"
+                  >
                     Admin Sign In
                   </button>
                 </SignInButton>
@@ -929,13 +1123,20 @@ function App() {
               <SignedIn>
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-2 w-100 w-lg-auto">
                   <SignOutButton redirectUrl="/">
-                    <button className="btn btn-outline-light fw-semibold w-100" type="button">
+                    <button
+                      className="btn btn-outline-light fw-semibold w-100"
+                      type="button"
+                    >
                       Logout
                     </button>
                   </SignOutButton>
                   <UserButton
                     afterSignOutUrl="/"
-                    appearance={{ elements: { userButtonAvatarBox: { width: '36px', height: '36px' } } }}
+                    appearance={{
+                      elements: {
+                        userButtonAvatarBox: { width: '36px', height: '36px' },
+                      },
+                    }}
                   />
                 </div>
               </SignedIn>
@@ -954,15 +1155,20 @@ function App() {
                 <p className="lead mb-4">{content.hero.description}</p>
                 <div className="state-selector card border-0 shadow-sm mx-auto">
                   <div className="card-body text-start">
-                    <p className="text-uppercase small fw-semibold text-primary mb-1">Mock exam state</p>
+                    <p className="text-uppercase small fw-semibold text-primary mb-1">
+                      Mock exam state
+                    </p>
                     <p className="h4 fw-bold mb-2">Washington</p>
                     <p className="text-muted mb-3">
-                      DriveReady currently focuses on Washington's written knowledge exam. Additional states will ship later.
+                      DriveReady currently focuses on Washington's written
+                      knowledge exam. Additional states will ship later.
                     </p>
                     <a className="btn btn-lg btn-primary" href="#mock-test">
                       Start Practicing
                     </a>
-                    <p className="mt-3 mb-0 text-muted small">{content.supportNote}</p>
+                    <p className="mt-3 mb-0 text-muted small">
+                      {content.supportNote}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -996,7 +1202,8 @@ function App() {
             </div>
             {!activeQuestionBank.length ? (
               <div className="alert alert-warning text-center" role="status">
-                We are curating the first question set for Washington. New practice items arrive shortly.
+                We are curating the first question set for Washington. New
+                practice items arrive shortly.
               </div>
             ) : (
               <div className="row g-4 align-items-start">
@@ -1018,14 +1225,20 @@ function App() {
                       >
                         <div
                           className="progress-bar bg-primary"
-                          style={{ width: `${hasActiveTest ? progressPercent : 0}%` }}
+                          style={{
+                            width: `${hasActiveTest ? progressPercent : 0}%`,
+                          }}
                         />
                       </div>
                       <div className="score-stat-row compact mb-1">
                         {liveScoreMetrics.map((metric) => (
                           <div key={metric.label} className="score-stat-chip">
-                            <span className="score-stat-label">{metric.label}</span>
-                            <span className="score-stat-value">{metric.value}</span>
+                            <span className="score-stat-label">
+                              {metric.label}
+                            </span>
+                            <span className="score-stat-value">
+                              {metric.value}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -1038,14 +1251,18 @@ function App() {
                     <div className="card-body">
                       <div className="d-flex justify-content-between align-items-start">
                         <div>
-                          <h3 className="h6 fw-semibold mb-1">Daily 10-question habit</h3>
+                          <h3 className="h6 fw-semibold mb-1">
+                            Daily 10-question habit
+                          </h3>
                           <p className="text-muted small mb-0">
                             {practiceStreak
                               ? `Current streak: ${practiceStreak} day${practiceStreak === 1 ? '' : 's'}`
                               : 'Solve 10 questions to start your streak.'}
                           </p>
                         </div>
-                        <span className={`badge ${hasMetPracticeGoal ? 'text-bg-success' : 'text-bg-primary'} rounded-pill`}>
+                        <span
+                          className={`badge ${hasMetPracticeGoal ? 'text-bg-success' : 'text-bg-primary'} rounded-pill`}
+                        >
                           {hasMetPracticeGoal ? 'Done' : 'In progress'}
                         </span>
                       </div>
@@ -1053,11 +1270,24 @@ function App() {
                         <div className="d-flex justify-content-between align-items-center">
                           <span className="small text-muted">Today</span>
                           <span className="small fw-semibold">
-                            {Math.min(todayQuestionCount, PRACTICE_GOAL_QUESTIONS)} / {PRACTICE_GOAL_QUESTIONS} questions
+                            {Math.min(
+                              todayQuestionCount,
+                              PRACTICE_GOAL_QUESTIONS,
+                            )}{' '}
+                            / {PRACTICE_GOAL_QUESTIONS} questions
                           </span>
                         </div>
-                        <div className="progress progress-thin my-2" role="progressbar" aria-valuemin={0} aria-valuemax={100} aria-valuenow={todayGoalPercent}>
-                          <div className="progress-bar bg-primary" style={{ width: `${todayGoalPercent}%` }} />
+                        <div
+                          className="progress progress-thin my-2"
+                          role="progressbar"
+                          aria-valuemin={0}
+                          aria-valuemax={100}
+                          aria-valuenow={todayGoalPercent}
+                        >
+                          <div
+                            className="progress-bar bg-primary"
+                            style={{ width: `${todayGoalPercent}%` }}
+                          />
                         </div>
                         <small className="d-block text-muted">
                           {hasMetPracticeGoal
@@ -1069,12 +1299,18 @@ function App() {
                         <p className="tiny-label text-muted d-flex justify-content-between mb-2">
                           <span>7-day snapshot</span>
                           <span className="text-primary fw-semibold">
-                            {practiceCalendar.completedDays}/{practiceCalendar.totalDays}
+                            {practiceCalendar.completedDays}/
+                            {practiceCalendar.totalDays}
                           </span>
                         </p>
-                        <div className="practice-calendar-grid" aria-live="polite">
+                        <div
+                          className="practice-calendar-grid"
+                          aria-live="polite"
+                        >
                           {isPracticeCalendarHydrating
-                            ? Array.from({ length: PRACTICE_CALENDAR_WINDOW_RADIUS * 2 + 1 }).map((_, index) => (
+                            ? Array.from({
+                                length: PRACTICE_CALENDAR_WINDOW_RADIUS * 2 + 1,
+                              }).map((_, index) => (
                                 <span
                                   key={`practice-day-loading-${index}`}
                                   className="practice-day practice-day--loading"
@@ -1082,7 +1318,8 @@ function App() {
                                 />
                               ))
                             : practiceCalendar.days.map((day) => {
-                                const isMet = day.questions >= PRACTICE_GOAL_QUESTIONS
+                                const isMet =
+                                  day.questions >= PRACTICE_GOAL_QUESTIONS
                                 const dayClasses = ['practice-day']
                                 if (isMet) {
                                   dayClasses.push('practice-day--met')
@@ -1097,15 +1334,27 @@ function App() {
                                   dayClasses.push('practice-day--missed')
                                 }
                                 return (
-                                  <span key={day.key} className={dayClasses.join(' ')}>
+                                  <span
+                                    key={day.key}
+                                    className={dayClasses.join(' ')}
+                                  >
                                     <span className="practice-day-letter">
-                                      {day.date.toLocaleDateString(undefined, { weekday: 'narrow' })}
+                                      {day.date.toLocaleDateString(undefined, {
+                                        weekday: 'narrow',
+                                      })}
                                     </span>
-                                    <span className="practice-day-date">{day.date.getDate()}</span>
+                                    <span className="practice-day-date">
+                                      {day.date.getDate()}
+                                    </span>
                                     {isMet && (
                                       <>
-                                        <span className="practice-day-dot" aria-hidden="true" />
-                                        <span className="visually-hidden">Practice goal met</span>
+                                        <span
+                                          className="practice-day-dot"
+                                          aria-hidden="true"
+                                        />
+                                        <span className="visually-hidden">
+                                          Practice goal met
+                                        </span>
                                       </>
                                     )}
                                   </span>
@@ -1114,12 +1363,19 @@ function App() {
                         </div>
                       </div>
                       <div className="reset-progress-cta border-top pt-3 mt-4">
-                        <p className="tiny-label text-muted mb-2">Need a fresh start?</p>
-                        <button className="btn btn-outline-danger w-100" type="button" onClick={handleOpenResetDialog}>
+                        <p className="tiny-label text-muted mb-2">
+                          Need a fresh start?
+                        </p>
+                        <button
+                          className="btn btn-outline-danger w-100"
+                          type="button"
+                          onClick={handleOpenResetDialog}
+                        >
                           Reset Progress
                         </button>
                         <small className="text-muted d-block mt-2">
-                          Clears your mock tests, Smart Review cards, and practice streak history.
+                          Clears your mock tests, Smart Review cards, and
+                          practice streak history.
                         </small>
                       </div>
                     </div>
@@ -1129,109 +1385,174 @@ function App() {
                   {testStatus === 'idle' ? (
                     <div className="card border-0 shadow-sm h-100">
                       <div className="card-body d-flex flex-column justify-content-center text-center">
-                        <h3 className="h5 fw-semibold mb-3">Ready to try the official-style knowledge test?</h3>
+                        <h3 className="h5 fw-semibold mb-3">
+                          Ready to try the official-style knowledge test?
+                        </h3>
                         <p className="text-muted">
-                          You will get {questionTargetCount} random questions each attempt with instant explanations and official guide references after every answer.
+                          You will get {questionTargetCount} random questions
+                          each attempt with instant explanations and official
+                          guide references after every answer.
                         </p>
                         <div className="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-3">
-                          <button className="btn btn-primary btn-lg" type="button" onClick={handleStartTest}>
+                          <button
+                            className="btn btn-primary btn-lg"
+                            type="button"
+                            onClick={handleStartTest}
+                          >
                             Start Mock Test
                           </button>
                         </div>
-                        <p className="small text-muted mt-3 mb-0">Questions reshuffle every time you restart.</p>
+                        <p className="small text-muted mt-3 mb-0">
+                          Questions reshuffle every time you restart.
+                        </p>
                       </div>
                     </div>
                   ) : (
                     <div className="card border-0 shadow-sm">
                       <div className="card-body">
                         {!currentQuestion ? (
-                          <div className="text-center text-muted">All questions completed. Restart to try again.</div>
+                          <div className="text-center text-muted">
+                            All questions completed. Restart to try again.
+                          </div>
                         ) : (
                           <>
                             <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-                              <span className="badge text-bg-primary">Question {currentQuestionIndex + 1} of {totalQuestions}</span>
-                              <button className="btn btn-sm btn-outline-secondary" type="button" onClick={handleRestartTest}>
+                              <span className="badge text-bg-primary">
+                                Question {currentQuestionIndex + 1} of{' '}
+                                {totalQuestions}
+                              </span>
+                              <button
+                                className="btn btn-sm btn-outline-secondary"
+                                type="button"
+                                onClick={handleRestartTest}
+                              >
                                 Restart
                               </button>
                             </div>
-                            {(dueQuestionIdSet.has(currentQuestion.id) || manualAdjustments[currentQuestion.id]) && (
-                              <div className="alert alert-warning d-flex align-items-center gap-2" role="status">
-                                <span className="badge text-bg-warning text-dark">Review card</span>
-                                <span>
-                                  {manualAdjustments[currentQuestion.id]
-                                    ? `Re-rated as ${manualAdjustments[currentQuestion.id]} from the review queue.`
-                                    : 'Scheduled in your Smart Review queue today.'}
-                                </span>
-                              </div>
-                            )}
+                            {hasSeenCurrentQuestionBefore &&
+                              (dueQuestionIdSet.has(currentQuestion.id) ||
+                                manualAdjustments[currentQuestion.id]) && (
+                                <div
+                                  className="alert alert-warning d-flex align-items-center gap-2"
+                                  role="status"
+                                >
+                                  <span className="badge text-bg-warning text-dark">
+                                    Review card
+                                  </span>
+                                  <span>
+                                    {manualAdjustments[currentQuestion.id]
+                                      ? `Re-rated as ${manualAdjustments[currentQuestion.id]} from the review queue.`
+                                      : 'Scheduled in your Smart Review queue today.'}
+                                  </span>
+                                </div>
+                              )}
                             {currentQuestion.image && (
                               <div className="question-image-frame">
                                 <img
                                   src={currentQuestion.image}
-                                  alt={currentQuestion.imageAlt ?? 'Road sign illustration'}
+                                  alt={
+                                    currentQuestion.imageAlt ??
+                                    'Road sign illustration'
+                                  }
                                 />
                               </div>
                             )}
-                            <h3 className="h5 fw-semibold mb-3">{currentQuestion.prompt}</h3>
+                            <h3 className="h5 fw-semibold mb-3">
+                              {currentQuestion.prompt}
+                            </h3>
                             <div className="list-group mb-4">
-                              {questionAnswers.map((answer: string, index: number) => {
-                                const revealAnswers = selectedAnswerIndex !== undefined || testStatus === 'complete'
-                                const isSelected = selectedAnswerIndex === index
-                                const isCorrectChoice = revealAnswers && currentQuestion.answerIndex === index
-                                const isIncorrectSelection = revealAnswers && isSelected && !isCorrectChoice
-                                const itemClasses = [
-                                  'list-group-item',
-                                  'list-group-item-action',
-                                  'd-flex',
-                                  'justify-content-between',
-                                  'align-items-center',
-                                  'gap-3',
-                                ]
-                                if (isCorrectChoice) {
-                                  itemClasses.push('border-success', 'bg-success-subtle')
-                                }
-                                if (isIncorrectSelection) {
-                                  itemClasses.push('border-danger', 'bg-danger-subtle')
-                                }
-                                const shouldShowFullBorder = isCorrectChoice || isIncorrectSelection
-                                return (
-                                  <button
-                                    key={`${currentQuestion.id}-${index}`}
-                                    className={itemClasses.join(' ')}
-                                    type="button"
-                                    onClick={() => handleSelectOption(index)}
-                                    disabled={revealAnswers}
-                                    style={shouldShowFullBorder ? { borderTopWidth: '1px' } : undefined}
-                                  >
-                                    <span className="text-start">{answer}</span>
-                                    {isCorrectChoice && (
-                                      <span className="badge text-bg-success">Correct</span>
-                                    )}
-                                    {isIncorrectSelection && (
-                                      <span className="badge text-bg-danger">Your choice</span>
-                                    )}
-                                  </button>
-                                )
-                              })}
+                              {questionAnswers.map(
+                                (answer: string, index: number) => {
+                                  const revealAnswers =
+                                    selectedAnswerIndex !== undefined ||
+                                    testStatus === 'complete'
+                                  const isSelected =
+                                    selectedAnswerIndex === index
+                                  const isCorrectChoice =
+                                    revealAnswers &&
+                                    currentQuestion.answerIndex === index
+                                  const isIncorrectSelection =
+                                    revealAnswers &&
+                                    isSelected &&
+                                    !isCorrectChoice
+                                  const itemClasses = [
+                                    'list-group-item',
+                                    'list-group-item-action',
+                                    'd-flex',
+                                    'justify-content-between',
+                                    'align-items-center',
+                                    'gap-3',
+                                  ]
+                                  if (isCorrectChoice) {
+                                    itemClasses.push(
+                                      'border-success',
+                                      'bg-success-subtle',
+                                    )
+                                  }
+                                  if (isIncorrectSelection) {
+                                    itemClasses.push(
+                                      'border-danger',
+                                      'bg-danger-subtle',
+                                    )
+                                  }
+                                  const shouldShowFullBorder =
+                                    isCorrectChoice || isIncorrectSelection
+                                  return (
+                                    <button
+                                      key={`${currentQuestion.id}-${index}`}
+                                      className={itemClasses.join(' ')}
+                                      type="button"
+                                      onClick={() => handleSelectOption(index)}
+                                      disabled={revealAnswers}
+                                      style={
+                                        shouldShowFullBorder
+                                          ? { borderTopWidth: '1px' }
+                                          : undefined
+                                      }
+                                    >
+                                      <span className="text-start">
+                                        {answer}
+                                      </span>
+                                      {isCorrectChoice && (
+                                        <span className="badge text-bg-success">
+                                          Correct
+                                        </span>
+                                      )}
+                                      {isIncorrectSelection && (
+                                        <span className="badge text-bg-danger">
+                                          Your choice
+                                        </span>
+                                      )}
+                                    </button>
+                                  )
+                                },
+                              )}
                             </div>
-                            {selectedAnswerIndex !== undefined && currentQuestion && (
-                              <div className="alert alert-info" role="status">
-                                <strong>Explanation:</strong> {currentQuestion.explanation}
-                                <br />
-                                <strong>From the official guide:</strong> <em>{currentQuestion.quote}</em>
-                                <br />
-                                <small className="text-muted">
-                                  Source:{' '}
-                                  {currentReferenceUrl ? (
-                                    <a href={currentReferenceUrl} target="_blank" rel="noreferrer">
-                                      {currentQuestion.reference}
-                                    </a>
-                                  ) : (
-                                    currentQuestion.reference
-                                  )}
-                                </small>
-                              </div>
-                            )}
+                            {selectedAnswerIndex !== undefined &&
+                              currentQuestion && (
+                                <div className="alert alert-info" role="status">
+                                  <strong>Explanation:</strong>{' '}
+                                  {currentQuestion.explanation}
+                                  <br />
+                                  <strong>From the official guide:</strong>{' '}
+                                  <em>{currentQuestion.quote}</em>
+                                  <br />
+                                  <small className="text-muted">
+                                    Source:{' '}
+                                    {currentReferenceUrl ? (
+                                      <a
+                                        href={currentReferenceUrl}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                      >
+                                        {currentQuestion.reference}
+                                      </a>
+                                    ) : (
+                                      currentQuestion.reference
+                                    )}
+                                  </small>
+                                </div>
+                              )}
                             <div className="d-flex flex-column flex-md-row justify-content-between align-items-stretch align-items-md-center gap-3 mt-4">
                               <button
                                 className="btn btn-outline-secondary"
@@ -1242,7 +1563,11 @@ function App() {
                                 Previous Question
                               </button>
                               <div className="d-flex gap-2 justify-content-end">
-                                <button className="btn btn-outline-secondary" type="button" onClick={handleRestartTest}>
+                                <button
+                                  className="btn btn-outline-secondary"
+                                  type="button"
+                                  onClick={handleRestartTest}
+                                >
                                   Start Over
                                 </button>
                                 <button
@@ -1251,7 +1576,11 @@ function App() {
                                   onClick={handleNextQuestion}
                                   disabled={!canNavigateForward}
                                 >
-                                  {isLastQuestion ? (testStatus === 'complete' ? 'Review Complete' : 'Finish Test') : 'Save & Next'}
+                                  {isLastQuestion
+                                    ? testStatus === 'complete'
+                                      ? 'Review Complete'
+                                      : 'Finish Test'
+                                    : 'Save & Next'}
                                 </button>
                               </div>
                             </div>
@@ -1271,7 +1600,9 @@ function App() {
             <div className="text-center mb-5">
               <h2 className="fw-bold">Smart Review</h2>
               <p className="text-muted m-0">
-                {"Build long-term memory with spaced repetition tuned for Washington's exam."}
+                {
+                  "Build long-term memory with spaced repetition tuned for Washington's exam."
+                }
               </p>
             </div>
             {!activeQuestionBank.length ? (
@@ -1284,15 +1615,21 @@ function App() {
                   <div className="col-md-3">
                     <div className="card h-100 border-0 shadow-sm">
                       <div className="card-body">
-                        <p className="text-muted text-uppercase small mb-1">Due Today</p>
-                        <p className="display-6 fw-bold mb-0">{dueTodayCount}</p>
+                        <p className="text-muted text-uppercase small mb-1">
+                          Due Today
+                        </p>
+                        <p className="display-6 fw-bold mb-0">
+                          {dueTodayCount}
+                        </p>
                       </div>
                     </div>
                   </div>
                   <div className="col-md-3">
                     <div className="card h-100 border-0 shadow-sm">
                       <div className="card-body">
-                        <p className="text-muted text-uppercase small mb-1">New Cards</p>
+                        <p className="text-muted text-uppercase small mb-1">
+                          New Cards
+                        </p>
                         <p className="display-6 fw-bold mb-0">{newCardCount}</p>
                       </div>
                     </div>
@@ -1300,17 +1637,27 @@ function App() {
                   <div className="col-md-3">
                     <div className="card h-100 border-0 shadow-sm">
                       <div className="card-body">
-                        <p className="text-muted text-uppercase small mb-1">Due Soon</p>
-                        <p className="display-6 fw-bold mb-0">{upcomingWithinWeek}</p>
-                        <p className="text-muted small mb-0">next: {nextDueLabel}</p>
+                        <p className="text-muted text-uppercase small mb-1">
+                          Due Soon
+                        </p>
+                        <p className="display-6 fw-bold mb-0">
+                          {upcomingWithinWeek}
+                        </p>
+                        <p className="text-muted small mb-0">
+                          next: {nextDueLabel}
+                        </p>
                       </div>
                     </div>
                   </div>
                   <div className="col-md-3">
                     <div className="card h-100 border-0 shadow-sm">
                       <div className="card-body">
-                        <p className="text-muted text-uppercase small mb-1">Ready Now</p>
-                        <p className="display-6 fw-bold mb-0">{reviewReadyCount}</p>
+                        <p className="text-muted text-uppercase small mb-1">
+                          Ready Now
+                        </p>
+                        <p className="display-6 fw-bold mb-0">
+                          {reviewReadyCount}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1319,12 +1666,18 @@ function App() {
                   <div className="card border-0 shadow-sm">
                     <div className="card-body d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
                       <div>
-                        <h3 className="h5 fw-semibold mb-2">Run an Anki-style review session</h3>
+                        <h3 className="h5 fw-semibold mb-2">
+                          Run an Anki-style review session
+                        </h3>
                         <p className="text-muted mb-0">
-                          We prioritise due cards, then introduce new questions when you are caught up.
+                          We prioritise due cards, then introduce new questions
+                          when you are caught up.
                         </p>
                         {reviewReadyCount === 0 && (
-                          <p className="text-muted small mb-0 mt-2">All cards are scheduled. Check back when new reviews unlock.</p>
+                          <p className="text-muted small mb-0 mt-2">
+                            All cards are scheduled. Check back when new reviews
+                            unlock.
+                          </p>
                         )}
                       </div>
                       <div className="d-flex flex-column flex-sm-row gap-2">
@@ -1340,15 +1693,19 @@ function App() {
                     </div>
                   </div>
                 )}
-                {reviewStatus === 'reviewing' && (
-                  reviewInProgressQuestion ? (
+                {reviewStatus === 'reviewing' &&
+                  (reviewInProgressQuestion ? (
                     <div className="card border-0 shadow-sm">
                       <div className="card-body">
                         <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
                           <span className="badge text-bg-primary">
                             Card {reviewIndex + 1} of {reviewQueue.length}
                           </span>
-                          <button className="btn btn-sm btn-outline-secondary" type="button" onClick={handleExitReview}>
+                          <button
+                            className="btn btn-sm btn-outline-secondary"
+                            type="button"
+                            onClick={handleExitReview}
+                          >
                             End Session
                           </button>
                         </div>
@@ -1356,62 +1713,103 @@ function App() {
                           <div className="question-image-frame">
                             <img
                               src={reviewInProgressQuestion.image}
-                              alt={reviewInProgressQuestion.imageAlt ?? 'Road sign illustration'}
+                              alt={
+                                reviewInProgressQuestion.imageAlt ??
+                                'Road sign illustration'
+                              }
                             />
                           </div>
                         )}
-                        <h3 className="h5 fw-semibold mb-3">{reviewInProgressQuestion.prompt}</h3>
+                        <h3 className="h5 fw-semibold mb-3">
+                          {reviewInProgressQuestion.prompt}
+                        </h3>
                         <div className="list-group mb-4">
-                          {reviewInProgressQuestion.choices.map((choice: string, index: number) => {
-                            const isCorrectChoice = index === reviewInProgressQuestion.answerIndex
-                            const isUserSelection = reviewSelectedChoice === index
-                            const showReveal = reviewRevealed
-                            const itemClasses = [
-                              'list-group-item',
-                              'list-group-item-action',
-                              'd-flex',
-                              'justify-content-between',
-                              'align-items-center',
-                              'gap-3',
-                              'text-start',
-                            ]
-                            if (showReveal && isCorrectChoice) {
-                              itemClasses.push('border-success', 'bg-success-subtle')
-                            }
-                            if (showReveal && isUserSelection && !isCorrectChoice) {
-                              itemClasses.push('border-danger', 'bg-danger-subtle')
-                            }
-                            return (
-                              <button
-                                key={`${reviewInProgressQuestion.id}-${index}`}
-                                type="button"
-                                className={itemClasses.join(' ')}
-                                style={showReveal && isCorrectChoice ? { borderTopWidth: '1px' } : undefined}
-                                onClick={() => handleSelectReviewChoice(index)}
-                                disabled={reviewRevealed}
-                              >
-                                <span className="text-start">{choice}</span>
-                                {showReveal && isCorrectChoice && <span className="badge text-bg-success">Correct</span>}
-                                {showReveal && isUserSelection && !isCorrectChoice && (
-                                  <span className="badge text-bg-danger">Your choice</span>
-                                )}
-                              </button>
-                            )
-                          })}
+                          {reviewInProgressQuestion.choices.map(
+                            (choice: string, index: number) => {
+                              const isCorrectChoice =
+                                index === reviewInProgressQuestion.answerIndex
+                              const isUserSelection =
+                                reviewSelectedChoice === index
+                              const showReveal = reviewRevealed
+                              const itemClasses = [
+                                'list-group-item',
+                                'list-group-item-action',
+                                'd-flex',
+                                'justify-content-between',
+                                'align-items-center',
+                                'gap-3',
+                                'text-start',
+                              ]
+                              if (showReveal && isCorrectChoice) {
+                                itemClasses.push(
+                                  'border-success',
+                                  'bg-success-subtle',
+                                )
+                              }
+                              if (
+                                showReveal &&
+                                isUserSelection &&
+                                !isCorrectChoice
+                              ) {
+                                itemClasses.push(
+                                  'border-danger',
+                                  'bg-danger-subtle',
+                                )
+                              }
+                              return (
+                                <button
+                                  key={`${reviewInProgressQuestion.id}-${index}`}
+                                  type="button"
+                                  className={itemClasses.join(' ')}
+                                  style={
+                                    showReveal && isCorrectChoice
+                                      ? { borderTopWidth: '1px' }
+                                      : undefined
+                                  }
+                                  onClick={() =>
+                                    handleSelectReviewChoice(index)
+                                  }
+                                  disabled={reviewRevealed}
+                                >
+                                  <span className="text-start">{choice}</span>
+                                  {showReveal && isCorrectChoice && (
+                                    <span className="badge text-bg-success">
+                                      Correct
+                                    </span>
+                                  )}
+                                  {showReveal &&
+                                    isUserSelection &&
+                                    !isCorrectChoice && (
+                                      <span className="badge text-bg-danger">
+                                        Your choice
+                                      </span>
+                                    )}
+                                </button>
+                              )
+                            },
+                          )}
                         </div>
                         {!reviewRevealed ? (
-                          <p className="text-muted fst-italic">Tap an answer choice to reveal the explanation.</p>
+                          <p className="text-muted fst-italic">
+                            Tap an answer choice to reveal the explanation.
+                          </p>
                         ) : (
                           <>
                             <div className="alert alert-info" role="status">
-                              <strong>Explanation:</strong> {reviewInProgressQuestion.explanation}
+                              <strong>Explanation:</strong>{' '}
+                              {reviewInProgressQuestion.explanation}
                               <br />
-                              <strong>From the official guide:</strong> <em>{reviewInProgressQuestion.quote}</em>
+                              <strong>From the official guide:</strong>{' '}
+                              <em>{reviewInProgressQuestion.quote}</em>
                               <br />
                               <small className="text-muted">
                                 Source:{' '}
                                 {reviewReferenceUrl ? (
-                                  <a href={reviewReferenceUrl} target="_blank" rel="noreferrer">
+                                  <a
+                                    href={reviewReferenceUrl}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                  >
                                     {reviewInProgressQuestion.reference}
                                   </a>
                                 ) : (
@@ -1420,23 +1818,50 @@ function App() {
                               </small>
                             </div>
                             <div className="d-flex flex-wrap gap-2">
-                              <button className="btn btn-outline-danger" type="button" onClick={() => handleReviewRate('again')}>
+                              <button
+                                className="btn btn-outline-danger"
+                                type="button"
+                                onClick={() => handleReviewRate('again')}
+                              >
                                 Again
                               </button>
-                              <button className="btn btn-outline-warning" type="button" onClick={() => handleReviewRate('hard')}>
+                              <button
+                                className="btn btn-outline-warning"
+                                type="button"
+                                onClick={() => handleReviewRate('hard')}
+                              >
                                 Hard
                               </button>
-                              <button className="btn btn-outline-primary" type="button" onClick={() => handleReviewRate('good')}>
+                              <button
+                                className="btn btn-outline-primary"
+                                type="button"
+                                onClick={() => handleReviewRate('good')}
+                              >
                                 Good
                               </button>
-                              <button className="btn btn-outline-success" type="button" onClick={() => handleReviewRate('easy')}>
+                              <button
+                                className="btn btn-outline-success"
+                                type="button"
+                                onClick={() => handleReviewRate('easy')}
+                              >
                                 Easy
                               </button>
-                              {manualAdjustments[reviewInProgressQuestion.id] && (
-                                <div className="alert alert-warning mt-3 w-100" role="status">
-                                  <strong>Manual Adjustment:</strong> This card was re-rated as
-                                  {' '}
-                                  <span className="text-capitalize">{manualAdjustments[reviewInProgressQuestion.id]}</span>
+                              {manualAdjustments[
+                                reviewInProgressQuestion.id
+                              ] && (
+                                <div
+                                  className="alert alert-warning mt-3 w-100"
+                                  role="status"
+                                >
+                                  <strong>Manual Adjustment:</strong> This card
+                                  was re-rated as{' '}
+                                  <span className="text-capitalize">
+                                    {
+                                      manualAdjustments[
+                                        reviewInProgressQuestion.id
+                                      ]
+                                    }
+                                  </span>
                                   {' during the mock test.'}
                                 </div>
                               )}
@@ -1448,23 +1873,30 @@ function App() {
                   ) : (
                     <div className="card border-0 shadow-sm">
                       <div className="card-body text-center text-muted">
-                        No cards queued. End the session and launch a new review.
+                        No cards queued. End the session and launch a new
+                        review.
                       </div>
                     </div>
-                  )
-                )}
+                  ))}
                 {reviewStatus === 'complete' && (
                   <div className="card border-0 shadow-sm">
                     <div className="card-body">
                       <div className="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
                         <div>
-                          <h3 className="h5 fw-semibold mb-2">Session complete</h3>
+                          <h3 className="h5 fw-semibold mb-2">
+                            Session complete
+                          </h3>
                           <p className="text-muted mb-0">
-                            You rated {reviewLog.length} {reviewLog.length === 1 ? 'card' : 'cards'}.
+                            You rated {reviewLog.length}{' '}
+                            {reviewLog.length === 1 ? 'card' : 'cards'}.
                           </p>
                         </div>
                         <div className="d-flex flex-column flex-sm-row gap-2">
-                          <button className="btn btn-outline-secondary" type="button" onClick={handleExitReview}>
+                          <button
+                            className="btn btn-outline-secondary"
+                            type="button"
+                            onClick={handleExitReview}
+                          >
                             Close
                           </button>
                           <button
@@ -1478,17 +1910,25 @@ function App() {
                         </div>
                       </div>
                       {reviewLog.length === 0 ? (
-                        <p className="text-muted mb-0">No cards were reviewed in this session.</p>
+                        <p className="text-muted mb-0">
+                          No cards were reviewed in this session.
+                        </p>
                       ) : (
                         <div className="row g-3">
-                          {(['again', 'hard', 'good', 'easy'] as ReviewRating[]).map((rating) => (
+                          {(
+                            ['again', 'hard', 'good', 'easy'] as ReviewRating[]
+                          ).map((rating) => (
                             <div key={rating} className="col-sm-3">
                               <div className="card h-100 border-0 bg-light">
                                 <div className="card-body text-center">
-                                  <span className={`badge ${ratingLabels[rating].className} mb-2`}>
+                                  <span
+                                    className={`badge ${ratingLabels[rating].className} mb-2`}
+                                  >
                                     {ratingLabels[rating].label}
                                   </span>
-                                  <p className="display-6 fw-bold mb-0">{ratingSummary[rating] ?? 0}</p>
+                                  <p className="display-6 fw-bold mb-0">
+                                    {ratingSummary[rating] ?? 0}
+                                  </p>
                                 </div>
                               </div>
                             </div>
@@ -1508,7 +1948,9 @@ function App() {
             <div className="text-center mb-5">
               <h2 className="fw-bold">Pre-Exam Checklist</h2>
               <p className="text-muted m-0">
-                {'Make exam day smooth with this Washington-specific readiness list.'}
+                {
+                  'Make exam day smooth with this Washington-specific readiness list.'
+                }
               </p>
             </div>
             <div className="row g-3">
@@ -1532,17 +1974,23 @@ function App() {
             aria-labelledby="reset-modal-title"
             onClick={handleCloseResetDialog}
           >
-            <div className="reset-modal-card card border-0 shadow-lg" onClick={(event) => event.stopPropagation()}>
+            <div
+              className="reset-modal-card card border-0 shadow-lg"
+              onClick={(event) => event.stopPropagation()}
+            >
               <div className="card-body">
                 <div className="d-flex align-items-center gap-2 mb-3">
-                  <span className="badge text-bg-warning text-dark">Warning</span>
+                  <span className="badge text-bg-warning text-dark">
+                    Warning
+                  </span>
                   <h3 className="h5 fw-semibold mb-0" id="reset-modal-title">
                     Reset all saved progress?
                   </h3>
                 </div>
                 <p className="text-muted mb-3">
-                  This wipes your mock tests, Smart Review history, adjustments, and daily practice log from this device. You
-                  will start fresh with a new session ID.
+                  This wipes your mock tests, Smart Review history, adjustments,
+                  and daily practice log from this device. You will start fresh
+                  with a new session ID.
                 </p>
                 <div className="alert alert-danger" role="status">
                   This action cannot be undone.
@@ -1569,12 +2017,14 @@ function App() {
             </div>
           </div>
         )}
+      </main>
 
-  </main>
-
-  <footer className="bg-primary text-white py-4 mt-auto">
+      <footer className="bg-primary text-white py-4 mt-auto">
         <div className="container d-flex flex-column flex-sm-row justify-content-between align-items-center gap-3">
-          <small>© {new Date().getFullYear()} DriveReady Mock Exams. All rights reserved.</small>
+          <small>
+            © {new Date().getFullYear()} DriveReady Mock Exams. All rights
+            reserved.
+          </small>
           <div className="d-flex gap-3">
             <a className="text-white text-decoration-none" href="#privacy">
               Privacy

@@ -83,8 +83,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Each WDL uniquely ties your Washington license, permit, or ID to you, allowing DOL to match every record to the right person.`,
-    quote: 'All Washington licenses, permits, and ID cards have an assigned Washington number. This number is specific to you.',
-    reference: 'Washington Driver Guide (2023), 1.1: Assigned WA Number (WDL Number)',
+    quote:
+      'All Washington licenses, permits, and ID cards have an assigned Washington number. This number is specific to you.',
+    reference:
+      'Washington Driver Guide (2023), 1.1: Assigned WA Number (WDL Number)',
   },
   {
     id: 2,
@@ -114,7 +116,8 @@ export const WA_QUESTIONS: Question[] = [
     explanation: `Keeping a home in Washington counts as residency, which triggers the requirement to get Washington credentials.`,
     quote:
       'You are a Washington resident if any of the following are true: • You maintain a residence in Washington for personal use.',
-    reference: 'Washington Driver Guide (2023), 1.4: Washington state residents',
+    reference:
+      'Washington Driver Guide (2023), 1.4: Washington state residents',
   },
   {
     id: 4,
@@ -122,7 +125,8 @@ export const WA_QUESTIONS: Question[] = [
     choices: ['15 days', '30 days', '45 days', '90 days'],
     answerIndex: 1,
     explanation: `Adults transferring from another state must secure their Washington license within 30 days of becoming residents.`,
-    quote: 'New residents that are licensed in another state have 30 days to obtain a Washington State driver license.',
+    quote:
+      'New residents that are licensed in another state have 30 days to obtain a Washington State driver license.',
     reference: 'Washington Driver Guide (2023), 1.5: New residents',
   },
   {
@@ -136,7 +140,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Washington requires teens transferring from other states to enter the intermediate licensing phase and verify their training history.`,
-    quote: 'If you’re under 18 and have your license from another state, you’ll need to apply for a Washington Intermediate Driver License.',
+    quote:
+      'If you’re under 18 and have your license from another state, you’ll need to apply for a Washington Intermediate Driver License.',
     reference: 'Washington Driver Guide (2023), 1.5: New residents',
   },
   {
@@ -145,8 +150,10 @@ export const WA_QUESTIONS: Question[] = [
     choices: ['Age 14½', 'Age 15', 'Age 15½', 'Age 16'],
     answerIndex: 1,
     explanation: `Students registered in a traffic safety program can secure a permit starting at age 15, up to 10 days before class begins.`,
-    quote: 'You can apply for your permit as early as 15 years old. Apply at a driver licensing office or online 1 to 10 days before your course starts.',
-    reference: 'Washington Driver Guide (2023), 1.8: Getting a personal driver license',
+    quote:
+      'You can apply for your permit as early as 15 years old. Apply at a driver licensing office or online 1 to 10 days before your course starts.',
+    reference:
+      'Washington Driver Guide (2023), 1.8: Getting a personal driver license',
   },
   {
     id: 7,
@@ -159,8 +166,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Without formal driver education, Washington lets you test knowledge at 15½, yet you must be an adult before attempting the road test.`,
-    quote: 'You can take the knowledge exam after you turn 15½. Once you pass, you’ll get your permit. However, you need to wait until you’re 18 to take the skills exam and get your license.',
-    reference: 'Washington Driver Guide (2023), 1.8: Getting a personal driver license',
+    quote:
+      'You can take the knowledge exam after you turn 15½. Once you pass, you’ll get your permit. However, you need to wait until you’re 18 to take the skills exam and get your license.',
+    reference:
+      'Washington Driver Guide (2023), 1.8: Getting a personal driver license',
   },
   {
     id: 8,
@@ -173,8 +182,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Washington’s permit lasts a year (renewable for a fee) while the knowledge test score must be used within two years.`,
-    quote: 'Your permit is valid for 1 year (can be renewed for a fee). Your knowledge exam score is only valid for 2 years.',
-    reference: 'Washington Driver Guide (2023), 1.8: Getting a personal driver license',
+    quote:
+      'Your permit is valid for 1 year (can be renewed for a fee). Your knowledge exam score is only valid for 2 years.',
+    reference:
+      'Washington Driver Guide (2023), 1.8: Getting a personal driver license',
   },
   {
     id: 9,
@@ -189,7 +200,8 @@ export const WA_QUESTIONS: Question[] = [
     explanation: `Initial intermediate rules limit teen passengers and prohibit unsupervised late-night driving to build safe habits.`,
     quote:
       '• No passengers under age 20 except immediate family members • No driving between 1 a.m. and 5 a.m. unless accompanied by a parent, guardian, or licensed driver at least age 25',
-    reference: 'Washington Driver Guide (2023), 1.8: Intermediate driver license',
+    reference:
+      'Washington Driver Guide (2023), 1.8: Intermediate driver license',
   },
   {
     id: 10,
@@ -202,8 +214,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Once the first phase is completed violation-free, teens can carry up to three non-family passengers under 20.`,
-    quote: '• No more than 3 passengers under age 20 except immediate family members • Nighttime restrictions expire after 1 year of safe driving',
-    reference: 'Washington Driver Guide (2023), 1.8: Intermediate driver license',
+    quote:
+      '• No more than 3 passengers under age 20 except immediate family members • Nighttime restrictions expire after 1 year of safe driving',
+    reference:
+      'Washington Driver Guide (2023), 1.8: Intermediate driver license',
   },
   {
     id: 11,
@@ -218,7 +232,8 @@ export const WA_QUESTIONS: Question[] = [
     explanation: `Washington escalates consequences for teen violations, culminating in suspension until age 18 on the third infraction.`,
     quote:
       '• 1st Violation: Current restrictions apply until you’re 18. • 2nd Violation: License is suspended for 6 months or until you turn 18, whichever comes first. • 3rd Violation: License is suspended until you’re 18.',
-    reference: 'Washington Driver Guide (2023), 1.8: Intermediate driver license',
+    reference:
+      'Washington Driver Guide (2023), 1.8: Intermediate driver license',
   },
   {
     id: 12,
@@ -233,7 +248,8 @@ export const WA_QUESTIONS: Question[] = [
     explanation: `Enhanced credentials satisfy REAL ID rules for TSA checkpoints and land/sea border entries, unlike standard IDs.`,
     quote:
       'Enhanced driver license and ID ... Suitable for: • Identification • Operating a motor vehicle (driver license only) • Domestic air travel • International border crossing by land or sea • Access to federal facilities ... Enhanced licenses and IDs meet REAL ID standards.',
-    reference: 'Washington Driver Guide (2023), 1.6: Identification and driver licenses',
+    reference:
+      'Washington Driver Guide (2023), 1.6: Identification and driver licenses',
   },
   {
     id: 13,
@@ -260,7 +276,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 2,
     explanation: `A vision screening is required, and corrective lenses use is recorded on the license if needed.`,
-    quote: 'DOL will check your vision before issuing your license. If you use corrective glasses or contact lenses, this will be recorded on your license.',
+    quote:
+      'DOL will check your vision before issuing your license. If you use corrective glasses or contact lenses, this will be recorded on your license.',
     reference: 'Washington Driver Guide (2023), 1.9: Health',
   },
   {
@@ -289,7 +306,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 2,
     explanation: `The guide warns to store the title securely away from the car to prevent theft or misuse.`,
-    quote: 'This is an important document! Keep it in a safe place but not in the vehicle.',
+    quote:
+      'This is an important document! Keep it in a safe place but not in the vehicle.',
     reference: 'Washington Driver Guide (2023), 2.0: Vehicle services',
   },
   {
@@ -319,7 +337,12 @@ export const WA_QUESTIONS: Question[] = [
   {
     id: 19,
     prompt: `What is the minimum acceptable tire tread depth in Washington?`,
-    choices: ['1/32 of an inch', '2/32 of an inch', '4/32 of an inch', '1/8 of an inch'],
+    choices: [
+      '1/32 of an inch',
+      '2/32 of an inch',
+      '4/32 of an inch',
+      '1/8 of an inch',
+    ],
     answerIndex: 1,
     explanation: `The guide warns that tread must be at least 2/32 inch to maintain traction, especially on wet roads.`,
     quote: 'Tire tread shouldn’t be less than 2/32 of an inch.',
@@ -336,7 +359,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `The guide recommends using headlights all the time, but the legal requirement is from half an hour after sunset to half an hour before sunrise and in poor visibility.`,
-    quote: 'Washington law says you need to have your headlights on a half hour after sunset to a half hour before sunrise.',
+    quote:
+      'Washington law says you need to have your headlights on a half hour after sunset to a half hour before sunrise.',
     reference: 'Washington Driver Guide (2023), 2.5: Vehicle maintenance',
   },
   {
@@ -350,7 +374,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 2,
     explanation: `Seat belts and child restraints are mandatory for everyone in a moving vehicle.`,
-    quote: 'Every person in a moving vehicle must wear a seat belt or be securely fastened into an approved child restraint device.',
+    quote:
+      'Every person in a moving vehicle must wear a seat belt or be securely fastened into an approved child restraint device.',
     reference: 'Washington Driver Guide (2023), 2.6: Occupant protection',
   },
   {
@@ -378,7 +403,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Airbag deployment can hurt young passengers, so kids under 13 belong in the back seat.`,
-    quote: 'Airbags are also why children under the age of 13 should never ride in the front seat. They could be seriously injured or killed if an airbag deploys.',
+    quote:
+      'Airbags are also why children under the age of 13 should never ride in the front seat. They could be seriously injured or killed if an airbag deploys.',
     reference: 'Washington Driver Guide (2023), 2.6: Airbags',
   },
   {
@@ -392,7 +418,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Blind zones hide nearby road users, so you must actively search them before moving.`,
-    quote: 'Blind zones are the areas around a vehicle you can’t see from the driver’s seat.',
+    quote:
+      'Blind zones are the areas around a vehicle you can’t see from the driver’s seat.',
     reference: 'Washington Driver Guide (2023), 2.12: Your blind zones',
   },
   {
@@ -421,7 +448,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Hand-to-hand steering keeps both hands on the top half of the wheel, typically around 9-3 or 10-2 positions.`,
-    quote: 'When using this method, your hands should be at 9 and 3 or 10 and 2.',
+    quote:
+      'When using this method, your hands should be at 9 and 3 or 10 and 2.',
     reference: 'Washington Driver Guide (2023), 2.7: Hand-to-hand steering',
   },
   {
@@ -430,7 +458,8 @@ export const WA_QUESTIONS: Question[] = [
     choices: ['Two', 'Three', 'Four', 'Five'],
     answerIndex: 2,
     explanation: `Practicing light, medium, firm, and emergency braking prepares you for any stop.`,
-    quote: 'There are 4 levels of braking: 1. Light 2. Medium 3. Firm 4. Emergency',
+    quote:
+      'There are 4 levels of braking: 1. Light 2. Medium 3. Firm 4. Emergency',
     reference: 'Washington Driver Guide (2023), 2.8: Braking pressure',
   },
   {
@@ -446,7 +475,8 @@ export const WA_QUESTIONS: Question[] = [
     explanation: `ABS keeps wheels from locking so you can steer around hazards even while braking hard.`,
     quote:
       'A vehicle’s Antilock Brake System (ABS) offers an important safety advantage by allowing drivers to steer during an emergency braking situation.',
-    reference: 'Washington Driver Guide (2023), 2.8: Antilock Braking Systems (ABS)',
+    reference:
+      'Washington Driver Guide (2023), 2.8: Antilock Braking Systems (ABS)',
   },
   {
     id: 29,
@@ -454,8 +484,10 @@ export const WA_QUESTIONS: Question[] = [
     choices: ['0.02%', '0.05%', '0.08% or higher', '0.10%'],
     answerIndex: 2,
     explanation: `Adults at or above 0.08% BAC face DUI consequences under Washington law.`,
-    quote: 'For drivers age 21 and older, having a BAC of .08% or higher is considered a DUI and can result in legal consequences.',
-    reference: 'Washington Driver Guide (2023), 1.15: Driving under the influence (DUI)',
+    quote:
+      'For drivers age 21 and older, having a BAC of .08% or higher is considered a DUI and can result in legal consequences.',
+    reference:
+      'Washington Driver Guide (2023), 1.15: Driving under the influence (DUI)',
   },
   {
     id: 30,
@@ -463,8 +495,10 @@ export const WA_QUESTIONS: Question[] = [
     choices: ['0.00%', '0.02% or more', '0.05%', 'Under-21 drivers are exempt'],
     answerIndex: 1,
     explanation: `Washington treats 0.02% BAC as a DUI for minors.`,
-    quote: 'Drivers under age 21 have the same potential consequences for having a BAC of 0.02%.',
-    reference: 'Washington Driver Guide (2023), 1.15: Driving under the influence (DUI)',
+    quote:
+      'Drivers under age 21 have the same potential consequences for having a BAC of 0.02%.',
+    reference:
+      'Washington Driver Guide (2023), 1.15: Driving under the influence (DUI)',
   },
   {
     id: 31,
@@ -477,8 +511,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Adults with more than 5 ng of active THC per mL of blood can be cited for DUI.`,
-    quote: 'For drivers age 21 and older, having more than 5 nanograms of active THC per milliliter of blood in their system is considered a DUI and can result in legal consequences.',
-    reference: 'Washington Driver Guide (2023), 1.15: Driving under the influence (DUI)',
+    quote:
+      'For drivers age 21 and older, having more than 5 nanograms of active THC per milliliter of blood in their system is considered a DUI and can result in legal consequences.',
+    reference:
+      'Washington Driver Guide (2023), 1.15: Driving under the influence (DUI)',
   },
   {
     id: 32,
@@ -505,8 +541,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Drivers may not hold phones or other electronics while driving; even hands-free use can still distract.`,
-    quote: 'Washington State has strict laws against distracted driving. You cannot hold any electronic device while driving (like cell phones, tablets, or gaming devices). This applies to all drivers, regardless of age or experience.',
-    reference: 'Washington Driver Guide (2023), 3.4: Washington\'s distracted driving laws',
+    quote:
+      'Washington State has strict laws against distracted driving. You cannot hold any electronic device while driving (like cell phones, tablets, or gaming devices). This applies to all drivers, regardless of age or experience.',
+    reference:
+      "Washington Driver Guide (2023), 3.4: Washington's distracted driving laws",
   },
   {
     id: 34,
@@ -519,8 +557,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Losing focus or memory of recent driving is a classic fatigue warning that requires a break.`,
-    quote: 'Here are some signs of fatigue. Pull over and rest if you are: • Having difficulty focusing, or you can’t remember driving the last few miles.',
-    reference: 'Washington Driver Guide (2023), 3.1: Fatigue and drowsy driving',
+    quote:
+      'Here are some signs of fatigue. Pull over and rest if you are: • Having difficulty focusing, or you can’t remember driving the last few miles.',
+    reference:
+      'Washington Driver Guide (2023), 3.1: Fatigue and drowsy driving',
   },
   {
     id: 35,
@@ -533,7 +573,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Aggressive driving involves intentional, dangerous acts against others on the road.`,
-    quote: 'Aggressive driving is when a driver purposely does something that endangers people or property.',
+    quote:
+      'Aggressive driving is when a driver purposely does something that endangers people or property.',
     reference: 'Washington Driver Guide (2023), 3.1: Aggressive driving',
   },
   {
@@ -591,8 +632,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Washington law requires drivers to yield to buses re-entering from stops when the bus signals intent.`,
-    quote: 'Yield to any transit vehicle traveling in the same direction as you that has signaled and is pulling back onto the roadway.',
-    reference: 'Washington Driver Guide (2023), 4.3: Sharing with transit buses',
+    quote:
+      'Yield to any transit vehicle traveling in the same direction as you that has signaled and is pulling back onto the roadway.',
+    reference:
+      'Washington Driver Guide (2023), 4.3: Sharing with transit buses',
   },
   {
     id: 40,
@@ -605,8 +648,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Staying out of truck blind spots helps the driver keep you in view.`,
-    quote: 'If you are near a large vehicle and can’t see the driver’s mirrors, the driver can’t see you.',
-    reference: 'Washington Driver Guide (2023), 4.4: Sharing with large vehicles',
+    quote:
+      'If you are near a large vehicle and can’t see the driver’s mirrors, the driver can’t see you.',
+    reference:
+      'Washington Driver Guide (2023), 4.4: Sharing with large vehicles',
   },
   {
     id: 41,
@@ -619,7 +664,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Motorcyclists constantly shift lane position and are entitled to the entire lane, so don’t crowd them.`,
-    quote: 'They’re entitled to the same lane width as all other vehicles. Never move into the same lane alongside a motorcyclist, even if the lane is wide and the motorcyclist is riding far to 1 side.',
+    quote:
+      'They’re entitled to the same lane width as all other vehicles. Never move into the same lane alongside a motorcyclist, even if the lane is wide and the motorcyclist is riding far to 1 side.',
     reference: 'Washington Driver Guide (2023), 4.5: Sharing with motorcycles',
   },
   {
@@ -640,11 +686,18 @@ export const WA_QUESTIONS: Question[] = [
   {
     id: 43,
     prompt: `How far from the nearest rail must you stop at an active railroad crossing?`,
-    choices: ['5 to 15 feet', '15 to 50 feet', '50 to 100 feet', 'No stopping is needed'],
+    choices: [
+      '5 to 15 feet',
+      '15 to 50 feet',
+      '50 to 100 feet',
+      'No stopping is needed',
+    ],
     answerIndex: 1,
     explanation: `Washington requires stopping 15–50 feet from the nearest rail when warning devices activate or a train is approaching.`,
-    quote: 'Stop between 15 and 50 feet away from the nearest rail of a crossing when: • The signal is flashing. • The crossing gate is lowering or already down ...',
-    reference: 'Washington Driver Guide (2023), 4.7: Sharing the road with trains',
+    quote:
+      'Stop between 15 and 50 feet away from the nearest rail of a crossing when: • The signal is flashing. • The crossing gate is lowering or already down ...',
+    reference:
+      'Washington Driver Guide (2023), 4.7: Sharing the road with trains',
   },
   {
     id: 44,
@@ -657,8 +710,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Farm vehicles often operate slowly; Washington instructs drivers to leave 3 feet of clearance while passing.`,
-    quote: 'As you pass, there should be at least 3 feet between the widest part of your vehicle and the agricultural vehicle.',
-    reference: 'Washington Driver Guide (2023), 4.8: Sharing with agricultural vehicles',
+    quote:
+      'As you pass, there should be at least 3 feet between the widest part of your vehicle and the agricultural vehicle.',
+    reference:
+      'Washington Driver Guide (2023), 4.8: Sharing with agricultural vehicles',
   },
   {
     id: 45,
@@ -671,8 +726,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Pulling right and stopping quickly creates space for responders to get through traffic.`,
-    quote: 'As soon as you see or hear the signals, immediately pull your vehicle to the right side of the road and stop. Wait until the emergency vehicle has passed before signaling and reentering traffic.',
-    reference: 'Washington Driver Guide (2023), 4.9: Sharing with emergency vehicles',
+    quote:
+      'As soon as you see or hear the signals, immediately pull your vehicle to the right side of the road and stop. Wait until the emergency vehicle has passed before signaling and reentering traffic.',
+    reference:
+      'Washington Driver Guide (2023), 4.9: Sharing with emergency vehicles',
   },
   {
     id: 46,
@@ -695,7 +752,8 @@ export const WA_QUESTIONS: Question[] = [
     choices: ['15 mph', '20 mph', '25 mph', '30 mph'],
     answerIndex: 1,
     explanation: `Washington caps school zone speeds at 20 mph to reduce crash severity for children.`,
-    quote: 'The school zone speed limit is 20 mph because higher speeds increase the risk of fatal crashes.',
+    quote:
+      'The school zone speed limit is 20 mph because higher speeds increase the risk of fatal crashes.',
     reference: 'Washington Driver Guide (2023), 4.17: School zone',
   },
   {
@@ -709,7 +767,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 2,
     explanation: `Washington doubles fines for violations in work zones that have workers present to encourage safer driving.`,
-    quote: 'Fines double for offenses committed while driving in construction areas when workers are present.',
+    quote:
+      'Fines double for offenses committed while driving in construction areas when workers are present.',
     reference: 'Washington Driver Guide (2023), 4.12: Work zone signs',
   },
   {
@@ -753,7 +812,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `A flashing yellow means slow, yield, and continue only when safe—just like a yield sign.`,
-    quote: 'A flashing yellow light has the same meaning as a yield sign. Treat the intersection as an uncontrolled intersection. Proceed when you have the right-of-way.',
+    quote:
+      'A flashing yellow light has the same meaning as a yield sign. Treat the intersection as an uncontrolled intersection. Proceed when you have the right-of-way.',
     reference: 'Washington Driver Guide (2023), 4.11: Flashing Yellow',
   },
   {
@@ -767,7 +827,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `A green arrow reserves the movement for you, meaning conflicting traffic should be stopped.`,
-    quote: 'A green arrow gives you the right-of-way to travel in that direction. There should be no oncoming vehicles, crossing traffic, or pedestrians while the arrow is green.',
+    quote:
+      'A green arrow gives you the right-of-way to travel in that direction. There should be no oncoming vehicles, crossing traffic, or pedestrians while the arrow is green.',
     reference: 'Washington Driver Guide (2023), 4.11: Green Arrow',
   },
   {
@@ -781,9 +842,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `A MUTCD R1-1 stop sign mandates a complete stop at the marked stopping point before proceeding.`,
-    quote: 'A stop sign means you must stop at the line, crosswalk, or corner. Look for crossing vehicles and pedestrians in all directions and yield the right-of-way.',
+    quote:
+      'A stop sign means you must stop at the line, crosswalk, or corner. Look for crossing vehicles and pedestrians in all directions and yield the right-of-way.',
     reference: 'Washington Driver Guide (2023), 4.12: Stop',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/c/c0/MUTCD_R1-1.svg',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/c/c0/MUTCD_R1-1.svg',
     imageAlt: 'MUTCD R1-1 stop sign',
   },
   {
@@ -797,9 +859,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `The MUTCD R1-2 yield sign directs you to yield to crossing traffic before entering the intersection.`,
-    quote: 'A yield sign means you must slow down and allow traffic that has the right-of-way to cross first.',
+    quote:
+      'A yield sign means you must slow down and allow traffic that has the right-of-way to cross first.',
     reference: 'Washington Driver Guide (2023), 4.12: Yield',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/3/39/MUTCD_R1-2.svg',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/3/39/MUTCD_R1-2.svg',
     imageAlt: 'MUTCD R1-2 yield sign',
   },
   {
@@ -813,9 +876,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `A MUTCD R5-1 Wrong Way sign warns you to stop and reverse course to avoid head-on collisions.`,
-    quote: 'Wrong Way: This alerts you that you’re driving in the wrong direction and is meant to prevent head-on collisions. Stop and turn around immediately.',
+    quote:
+      'Wrong Way: This alerts you that you’re driving in the wrong direction and is meant to prevent head-on collisions. Stop and turn around immediately.',
     reference: 'Washington Driver Guide (2023), 4.12: Wrong Way',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/MUTCD_R5-1.svg',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/MUTCD_R5-1.svg',
     imageAlt: 'MUTCD R5-1 wrong way sign',
   },
   {
@@ -829,9 +893,12 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Penant-shaped MUTCD W14-3 signs mark areas where passing other vehicles is prohibited.`,
-    quote: 'No passing and passing safely: These signs tell you where passing isn’t allowed.',
-    reference: 'Washington Driver Guide (2023), 4.12: No passing and passing safely',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/e/eb/MUTCD_W14-3.svg',
+    quote:
+      'No passing and passing safely: These signs tell you where passing isn’t allowed.',
+    reference:
+      'Washington Driver Guide (2023), 4.12: No passing and passing safely',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/e/eb/MUTCD_W14-3.svg',
     imageAlt: 'MUTCD W14-3 no passing zone sign',
   },
   {
@@ -845,8 +912,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Drivers must look left and yield to circulating traffic before entering the roundabout.`,
-    quote: 'Yield to all traffic in the roundabout. Look left and yield to all traffic already in the roundabout since they have the right-of-way.',
-    reference: 'Washington Driver Guide (2023), 4.15: How to drive a roundabout',
+    quote:
+      'Yield to all traffic in the roundabout. Look left and yield to all traffic already in the roundabout since they have the right-of-way.',
+    reference:
+      'Washington Driver Guide (2023), 4.15: How to drive a roundabout',
   },
   {
     id: 58,
@@ -859,17 +928,25 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Washington bans U-turns in places where you can’t see oncoming traffic, like curves or hill crests.`,
-    quote: 'You must have clear visibility in all directions before making a U-turn. For that reason, do not make a U-turn on a curve or when approaching the crest of a hill.',
+    quote:
+      'You must have clear visibility in all directions before making a U-turn. For that reason, do not make a U-turn on a curve or when approaching the crest of a hill.',
     reference: 'Washington Driver Guide (2023), 4.14: U-turns',
   },
   {
     id: 59,
     prompt: `How far may you travel in a center two-way left-turn lane?`,
-    choices: ['Up to 100 feet', 'No more than 300 feet', 'As far as needed for passing', 'Only 25 feet'],
+    choices: [
+      'Up to 100 feet',
+      'No more than 300 feet',
+      'As far as needed for passing',
+      'Only 25 feet',
+    ],
     answerIndex: 1,
     explanation: `Center lanes are just for preparing to turn; they must not be used for long-distance travel or passing, and the guide caps travel at 300 feet.`,
-    quote: 'These lanes must not be used for passing. You shouldn’t travel farther than 300 feet in a center lane.',
-    reference: 'Washington Driver Guide (2023), 4.16: Solid yellow line on your side',
+    quote:
+      'These lanes must not be used for passing. You shouldn’t travel farther than 300 feet in a center lane.',
+    reference:
+      'Washington Driver Guide (2023), 4.16: Solid yellow line on your side',
   },
   {
     id: 60,
@@ -882,7 +959,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 2,
     explanation: `HOV lanes are set aside for vehicles with the required occupants plus motorcycles and transit.`,
-    quote: 'HOV lanes are reserved for carpools, vanpools, and buses... To travel in an HOV lane, a vehicle must meet the occupancy requirements posted on the signs. Motorcycles are also allowed to use HOV lanes.',
+    quote:
+      'HOV lanes are reserved for carpools, vanpools, and buses... To travel in an HOV lane, a vehicle must meet the occupancy requirements posted on the signs. Motorcycles are also allowed to use HOV lanes.',
     reference: 'Washington Driver Guide (2023), 4.16: HOV / Carpool lane',
   },
   {
@@ -896,7 +974,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 0,
     explanation: `Reversible lane signals explicitly tell you when the lane is open, closed, or about to change.`,
-    quote: 'Check with the overhead signs before you start driving in a reversible lane. A green arrow means you can use the lane, and, a red X means you can’t. A steady yellow X means the lane is changing direction, and you should move out of the lane as soon as it’s safe.',
+    quote:
+      'Check with the overhead signs before you start driving in a reversible lane. A green arrow means you can use the lane, and, a red X means you can’t. A steady yellow X means the lane is changing direction, and you should move out of the lane as soon as it’s safe.',
     reference: 'Washington Driver Guide (2023), 4.16: Reversible lane',
   },
   {
@@ -910,13 +989,19 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Drivers must expect people in any intersection because every intersection is legally a crosswalk.`,
-    quote: 'Not all crosswalks are marked! Every intersection is legally defined as a crosswalk regardless of whether a crosswalk marking is present.',
+    quote:
+      'Not all crosswalks are marked! Every intersection is legally defined as a crosswalk regardless of whether a crosswalk marking is present.',
     reference: 'Washington Driver Guide (2023), 4.16: Crosswalks',
   },
   {
     id: 63,
     prompt: `How close can you park to a fire hydrant?`,
-    choices: ['Within 5 feet', 'Within 10 feet', 'At least 15 feet away', 'There is no restriction'],
+    choices: [
+      'Within 5 feet',
+      'Within 10 feet',
+      'At least 15 feet away',
+      'There is no restriction',
+    ],
     answerIndex: 2,
     explanation: `Parking within 15 feet of a hydrant is prohibited to keep access clear for firefighters.`,
     quote: 'Do not park: • Within 15 feet of a fire hydrant.',
@@ -933,7 +1018,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Turning wheels away from the curb when uphill ensures the car rolls into the curb if the brake fails.`,
-    quote: 'On hills with tall curbs, turn your steering wheel away from the curb until the back of your front tire touches the curb.',
+    quote:
+      'On hills with tall curbs, turn your steering wheel away from the curb until the back of your front tire touches the curb.',
     reference: 'Washington Driver Guide (2023), 4.18: Facing up the hill',
   },
   {
@@ -947,8 +1033,10 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `It is illegal to occupy an EV charging spot if you aren’t actively charging.`,
-    quote: 'It’s illegal to park a vehicle in any electric vehicle charging station if the vehicle is not connected to the charging equipment.',
-    reference: 'Washington Driver Guide (2023), 4.18: Electric vehicle charging station parking',
+    quote:
+      'It’s illegal to park a vehicle in any electric vehicle charging station if the vehicle is not connected to the charging equipment.',
+    reference:
+      'Washington Driver Guide (2023), 4.18: Electric vehicle charging station parking',
   },
   {
     id: 66,
@@ -961,7 +1049,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Securing loads with straps or nets prevents debris from endangering other road users.`,
-    quote: 'Driving with an unsecured load is both against the law and extremely dangerous. Secure your load so loose items don’t release into the air or slide, shift, or fall onto the road and cause a crash.',
+    quote:
+      'Driving with an unsecured load is both against the law and extremely dangerous. Secure your load so loose items don’t release into the air or slide, shift, or fall onto the road and cause a crash.',
     reference: 'Washington Driver Guide (2023), 4.19: Secure your load',
   },
   {
@@ -989,7 +1078,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Beach driving is restricted to certain Pacific Coast areas and considered a state highway with a 25 mph limit.`,
-    quote: 'Driving is allowed on ocean beaches only in Grays Harbor and Pacific Counties. The beach is considered a state highway, so all driving laws apply.',
+    quote:
+      'Driving is allowed on ocean beaches only in Grays Harbor and Pacific Counties. The beach is considered a state highway, so all driving laws apply.',
     reference: 'Washington Driver Guide (2023), 4.20: Beaches',
   },
   {
@@ -1003,7 +1093,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Risk awareness means staying alert to actual and potential hazards to manage them proactively.`,
-    quote: 'Risk awareness is your ability to identify present and potential hazards on the road. It helps you be aware of things that might require you to change your behavior to avoid a crash.',
+    quote:
+      'Risk awareness is your ability to identify present and potential hazards on the road. It helps you be aware of things that might require you to change your behavior to avoid a crash.',
     reference: 'Washington Driver Guide (2023), 5.0: Risk awareness',
   },
   {
@@ -1032,7 +1123,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `The guide’s routine begins with planning by observing your surroundings and deciding how to respond safely.`,
-    quote: 'Plan. Scan your environment to know what’s happening around you. Be sure you also look in your rearview mirror to see what’s happening behind you. Decide if the change you want to make is safe.',
+    quote:
+      'Plan. Scan your environment to know what’s happening around you. Be sure you also look in your rearview mirror to see what’s happening behind you. Decide if the change you want to make is safe.',
     reference: 'Washington Driver Guide (2023), 5.0: Hazard management',
   },
   {
@@ -1046,7 +1138,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Higher speeds mean longer stopping distances and more severe crashes.`,
-    quote: 'It takes longer to stop a vehicle at higher speeds. This increases the risk of a collision if you need to brake suddenly.',
+    quote:
+      'It takes longer to stop a vehicle at higher speeds. This increases the risk of a collision if you need to brake suddenly.',
     reference: 'Washington Driver Guide (2023), 5.1: Excessive speeds',
   },
   {
@@ -1060,7 +1153,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Drivers must slow down below the posted limit whenever conditions warrant.`,
-    quote: 'Washington law also requires you to drive at speeds that are safe for current road conditions. This means reducing your speed when conditions are poor.',
+    quote:
+      'Washington law also requires you to drive at speeds that are safe for current road conditions. This means reducing your speed when conditions are poor.',
     reference: 'Washington Driver Guide (2023), 5.1: Speed limits',
   },
   {
@@ -1074,7 +1168,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Leaving extra room gives you time to take an alternate path if something goes wrong up ahead.`,
-    quote: 'When you’re driving near other vehicles, it’s important to leave a distance that’s at least twice the length of your vehicle between you and the vehicle ahead.',
+    quote:
+      'When you’re driving near other vehicles, it’s important to leave a distance that’s at least twice the length of your vehicle between you and the vehicle ahead.',
     reference: 'Washington Driver Guide (2023), 5.2: Space',
   },
   {
@@ -1103,7 +1198,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `The guide recommends the 15-second marker exercise to improve time estimation.`,
-    quote: 'Pick out a marker, such as a road sign or utility pole, that you think is 15 seconds ahead of your vehicle. Count until you reach the marker.',
+    quote:
+      'Pick out a marker, such as a road sign or utility pole, that you think is 15 seconds ahead of your vehicle. Count until you reach the marker.',
     reference: 'Washington Driver Guide (2023), 5.4: Count seconds',
   },
   {
@@ -1117,7 +1213,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 0,
     explanation: `The guide emphasizes that your brain can focus on only one task, so eliminate distractions while driving.`,
-    quote: 'Your full attention is essential for safe driving. Your brain can only focus on 1 thing at a time.',
+    quote:
+      'Your full attention is essential for safe driving. Your brain can only focus on 1 thing at a time.',
     reference: 'Washington Driver Guide (2023), 5.5: Attention',
   },
   {
@@ -1131,7 +1228,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Night driving speed should allow you to stop within your headlight illumination—roughly 400 feet.`,
-    quote: 'Drive at a speed that will allow you to stop within the glow of your headlights (usually 400 feet).',
+    quote:
+      'Drive at a speed that will allow you to stop within the glow of your headlights (usually 400 feet).',
     reference: 'Washington Driver Guide (2023), 5.6: Night driving',
   },
   {
@@ -1159,7 +1257,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Shaded areas and bridge decks ice up before the rest of the roadway, so use extra caution.`,
-    quote: 'On cold, wet days, shady spots can be icy. Overpasses and other types of bridges can have icy spots even when the rest of the road doesn’t.',
+    quote:
+      'On cold, wet days, shady spots can be icy. Overpasses and other types of bridges can have icy spots even when the rest of the road doesn’t.',
     reference: 'Washington Driver Guide (2023), 5.6: Slippery roads',
   },
   {
@@ -1173,7 +1272,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Releasing the accelerator helps the tires regain traction before you steer back on course.`,
-    quote: 'If you’re skidding, do the following: 1. Take your foot off the accelerator.',
+    quote:
+      'If you’re skidding, do the following: 1. Take your foot off the accelerator.',
     reference: 'Washington Driver Guide (2023), 5.6: Skidding',
   },
   {
@@ -1187,7 +1287,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `The guide recommends calmly reducing speed and keeping the wheels pointed where you want to go until the tires reconnect.`,
-    quote: 'If you hydroplane, it is important to do the following: • Take your foot off the accelerator. • Gently press the brakes ... • Keep the steering wheel steady.',
+    quote:
+      'If you hydroplane, it is important to do the following: • Take your foot off the accelerator. • Gently press the brakes ... • Keep the steering wheel steady.',
     reference: 'Washington Driver Guide (2023), 5.6: Hydroplaning',
   },
   {
@@ -1201,7 +1302,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `A gentle deceleration while holding the wheel straight keeps the vehicle stable after a blowout.`,
-    quote: 'If a tire blows out or suddenly goes flat: • Grip the steering wheel firmly and keep the vehicle going straight. • Slow down gradually. Take your foot off the accelerator. • Do not brake. Allow the vehicle to slow by itself, or brake gently if necessary.',
+    quote:
+      'If a tire blows out or suddenly goes flat: • Grip the steering wheel firmly and keep the vehicle going straight. • Slow down gradually. Take your foot off the accelerator. • Do not brake. Allow the vehicle to slow by itself, or brake gently if necessary.',
     reference: 'Washington Driver Guide (2023), 5.7: Tires',
   },
   {
@@ -1215,7 +1317,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Switching on other lights and pulling over safely prevents collisions after headlight failure.`,
-    quote: 'If your headlights suddenly go out: • Put on your hazard warning lights, turn signals, or fog lights, if you have them. • Pull off the road as soon as possible.',
+    quote:
+      'If your headlights suddenly go out: • Put on your hazard warning lights, turn signals, or fog lights, if you have them. • Pull off the road as soon as possible.',
     reference: 'Washington Driver Guide (2023), 5.7: Headlights',
   },
   {
@@ -1229,7 +1332,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Shifting to neutral lets the engine rev while you steer to safety before shutting it down.`,
-    quote: 'If the vehicle keeps going faster and faster: • Keep your eyes on the road. • Quickly shift to neutral. • Pull off the road when safe to do so. • Turn off the engine.',
+    quote:
+      'If the vehicle keeps going faster and faster: • Keep your eyes on the road. • Quickly shift to neutral. • Pull off the road when safe to do so. • Turn off the engine.',
     reference: 'Washington Driver Guide (2023), 5.7: Accelerator',
   },
   {
@@ -1243,7 +1347,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Washington law requires you to stay at the scene and notify 911 when injuries occur.`,
-    quote: 'Do not drive away. If anyone is injured or killed, call 911. Law enforcement must be notified.',
+    quote:
+      'Do not drive away. If anyone is injured or killed, call 911. Law enforcement must be notified.',
     reference: 'Washington Driver Guide (2023), 5.9: Crashing a vehicle',
   },
   {
@@ -1257,7 +1362,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `State law requires a collision report within four days unless law enforcement already filed it.`,
-    quote: 'File a collision report form, within 4 days of a crash, if a law enforcement officer doesn’t do this for you. The form is required by state law.',
+    quote:
+      'File a collision report form, within 4 days of a crash, if a law enforcement officer doesn’t do this for you. The form is required by state law.',
     reference: 'Washington Driver Guide (2023), 5.9: Reporting a crash',
   },
   {
@@ -1271,7 +1377,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Staying inside keeps you insulated unless fire forces a proper jump exit; always assume lines are energized.`,
-    quote: 'If a power line comes in contact with your vehicle, do not get out of the vehicle... Turn off your engine, call 911, and stay inside your vehicle until emergency responders arrive.',
+    quote:
+      'If a power line comes in contact with your vehicle, do not get out of the vehicle... Turn off your engine, call 911, and stay inside your vehicle until emergency responders arrive.',
     reference: 'Washington Driver Guide (2023), 5.9: Encountering power lines',
   },
   {
@@ -1285,7 +1392,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `The guide recommends stocking essentials so you can handle unexpected breakdowns or delays.`,
-    quote: 'It’s a good idea to keep an emergency kit in your vehicle. Here are some items you might want to have in an emergency: • First aid kit • Flashlight • Blanket • Water ...',
+    quote:
+      'It’s a good idea to keep an emergency kit in your vehicle. Here are some items you might want to have in an emergency: • First aid kit • Flashlight • Blanket • Water ...',
     reference: 'Washington Driver Guide (2023), 5.9: Emergency kit',
   },
   {
@@ -1314,7 +1422,8 @@ export const WA_QUESTIONS: Question[] = [
     ],
     answerIndex: 1,
     explanation: `Signing a ticket only confirms you received it; refusing can lead to arrest and more trouble.`,
-    quote: 'If you get a ticket, you are required to sign for it. Your acceptance and signature isn’t an admission of guilt. However, refusing to sign a traffic ticket could result in your arrest.',
+    quote:
+      'If you get a ticket, you are required to sign for it. Your acceptance and signature isn’t an admission of guilt. However, refusing to sign a traffic ticket could result in your arrest.',
     reference: 'Washington Driver Guide (2023), 5.10: Getting a ticket',
   },
   {
@@ -1341,12 +1450,12 @@ export const WA_QUESTIONS: Question[] = [
       'Use it only as a suggested minimum speed',
     ],
     answerIndex: 0,
-    explanation:
-      `Speed limit signs post the maximum (and sometimes minimum) lawful speed for ideal conditions, so you’re still obligated to ease off the accelerator whenever rain, fog, traffic, or road surface changes make the legal limit unsafe. Driving “too fast for conditions” can still earn a citation even when you’re technically under the posted number.`,
+    explanation: `Speed limit signs post the maximum (and sometimes minimum) lawful speed for ideal conditions, so you’re still obligated to ease off the accelerator whenever rain, fog, traffic, or road surface changes make the legal limit unsafe. Driving “too fast for conditions” can still earn a citation even when you’re technically under the posted number.`,
     quote:
       'These signs tell you the maximum safe speed allowed or the minimum safe speed required. The maximum speed limit is for ideal conditions. Reduce your speed when road conditions require it — like the roadway is slippery or it’s foggy and difficult to see.',
-    reference: 'Washington Driver Guide (2023), 4.12: Common signs – Speed Limit',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/MUTCD_R2-1.svg',
+    reference:
+      'Washington Driver Guide (2023), 4.12: Common signs – Speed Limit',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/8/8b/MUTCD_R2-1.svg',
     imageAlt: 'MUTCD R2-1 speed limit sign showing 55 mph',
   },
   {
@@ -1359,11 +1468,12 @@ export const WA_QUESTIONS: Question[] = [
       'Make a U-turn to find another route',
     ],
     answerIndex: 0,
-    explanation:
-      `Keep Right reminders are about lane discipline: stay in the right lane for cruising, slide left only long enough to pass, and then merge back so faster traffic and emergency vehicles can move safely. Camping in the left lane violates Washington’s “keep right except to pass” expectation and creates unnecessary congestion.`,
-    quote: 'This sign reminds you to stay in the right lane unless you’re passing another vehicle.',
-    reference: 'Washington Driver Guide (2023), 4.12: Common signs – Keep Right',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/4/40/MUTCD_R4-7.svg',
+    explanation: `Keep Right reminders are about lane discipline: stay in the right lane for cruising, slide left only long enough to pass, and then merge back so faster traffic and emergency vehicles can move safely. Camping in the left lane violates Washington’s “keep right except to pass” expectation and creates unnecessary congestion.`,
+    quote:
+      'This sign reminds you to stay in the right lane unless you’re passing another vehicle.',
+    reference:
+      'Washington Driver Guide (2023), 4.12: Common signs – Keep Right',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/4/40/MUTCD_R4-7.svg',
     imageAlt: 'MUTCD R4-7 keep right regulatory sign with divider arrow',
   },
   {
@@ -1376,11 +1486,12 @@ export const WA_QUESTIONS: Question[] = [
       'Two-way traffic is allowed but passing is prohibited',
     ],
     answerIndex: 0,
-    explanation:
-      `One Way signs protect everyone from head-on conflicts; if you see the arrow, you must enter and travel only in that direction because opposing traffic has no reason to expect you coming at them. Entering against the arrow often puts you directly into transit lanes or multi-lane arterials at speed, so always look for cross-street arrows before turning.`,
-    quote: 'These signs identify where traffic flows only in the direction of the arrow. Never drive the wrong way on a 1-way street.',
+    explanation: `One Way signs protect everyone from head-on conflicts; if you see the arrow, you must enter and travel only in that direction because opposing traffic has no reason to expect you coming at them. Entering against the arrow often puts you directly into transit lanes or multi-lane arterials at speed, so always look for cross-street arrows before turning.`,
+    quote:
+      'These signs identify where traffic flows only in the direction of the arrow. Never drive the wrong way on a 1-way street.',
     reference: 'Washington Driver Guide (2023), 4.12: Common signs – 1-Way',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/MUTCD_R6-1R.svg',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/a/a6/MUTCD_R6-1R.svg',
     imageAlt: 'MUTCD R6-1 one way sign with a right-pointing arrow',
   },
   {
@@ -1393,11 +1504,12 @@ export const WA_QUESTIONS: Question[] = [
       'You must merge left within 50 feet',
     ],
     answerIndex: 0,
-    explanation:
-      `A Do Not Enter sign is the last warning before you drive straight into opposing traffic—common at freeway off-ramps, divided highway medians, and one-way couplets. When you encounter it, stop, look for alternate routing, and never try to “sneak through” even if the street appears empty.`,
-    quote: 'A square sign with a white horizontal line inside a circle means you can’t enter the street from that direction.',
-    reference: 'Washington Driver Guide (2023), 4.12: Common signs – Do Not Enter',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/MUTCD_R5-1.svg',
+    explanation: `A Do Not Enter sign is the last warning before you drive straight into opposing traffic—common at freeway off-ramps, divided highway medians, and one-way couplets. When you encounter it, stop, look for alternate routing, and never try to “sneak through” even if the street appears empty.`,
+    quote:
+      'A square sign with a white horizontal line inside a circle means you can’t enter the street from that direction.',
+    reference:
+      'Washington Driver Guide (2023), 4.12: Common signs – Do Not Enter',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/7/7d/MUTCD_R5-1.svg',
     imageAlt: 'MUTCD R5-1 do not enter sign',
   },
   {
@@ -1410,11 +1522,12 @@ export const WA_QUESTIONS: Question[] = [
       'Using the left lane for passing',
     ],
     answerIndex: 0,
-    explanation:
-      `No U-Turn signs are usually placed where sight distance, traffic volume, or roadway width would make turning around unsafe. Respecting the restriction keeps you out of blind hills, school zones, rail crossings, and other spots where swinging the front of your vehicle across lanes could trigger a crash.`,
-    quote: 'Some regulatory signs have a red circle with a red slash over a symbol. These signs indicate certain actions, such as left turns, right turns, or U-turns, are not allowed.',
-    reference: 'Washington Driver Guide (2023), 4.12: Common signs – Not allowed',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/d/d1/MUTCD_R3-4.svg',
+    explanation: `No U-Turn signs are usually placed where sight distance, traffic volume, or roadway width would make turning around unsafe. Respecting the restriction keeps you out of blind hills, school zones, rail crossings, and other spots where swinging the front of your vehicle across lanes could trigger a crash.`,
+    quote:
+      'Some regulatory signs have a red circle with a red slash over a symbol. These signs indicate certain actions, such as left turns, right turns, or U-turns, are not allowed.',
+    reference:
+      'Washington Driver Guide (2023), 4.12: Common signs – Not allowed',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/d/d1/MUTCD_R3-4.svg',
     imageAlt: 'MUTCD R3-4 no U-turn sign',
   },
   {
@@ -1427,12 +1540,13 @@ export const WA_QUESTIONS: Question[] = [
       'Stop completely before the sign',
     ],
     answerIndex: 0,
-    explanation:
-      `Advisory speed plaques are tied to the hazard pictured above them—curves, merges, ramps, or surface changes—and give a recommended maximum for that specific feature. They aren’t a new limit for the entire road but they are engineered for comfortable traction, so slowing to that number (or less in poor weather) keeps you within your lane.`,
+    explanation: `Advisory speed plaques are tied to the hazard pictured above them—curves, merges, ramps, or surface changes—and give a recommended maximum for that specific feature. They aren’t a new limit for the entire road but they are engineered for comfortable traction, so slowing to that number (or less in poor weather) keeps you within your lane.`,
     quote:
       'These signs indicate that a speed change is recommended for a potential hazard or road condition (often a curve or turn). Adjust your speed appropriately given all factors (road, weather, traffic, etc.) and follow the speed warning limit.',
-    reference: 'Washington Driver Guide (2023), 4.12: Common signs – Speed warning',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/4/4a/MUTCD_W13-1P.svg',
+    reference:
+      'Washington Driver Guide (2023), 4.12: Common signs – Speed warning',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/4/4a/MUTCD_W13-1P.svg',
     imageAlt: 'MUTCD W13-1P advisory speed plaque showing 35 mph',
   },
   {
@@ -1445,11 +1559,12 @@ export const WA_QUESTIONS: Question[] = [
       'Only trucks may continue beyond this point',
     ],
     answerIndex: 0,
-    explanation:
-      `Roundabout advance signs alert you early so you can pick the correct lane, drop to the 15–25 mph design speed, and prepare to yield to people already circulating and to pedestrians in the crosswalks. Entering too fast or from the wrong lane is a common source of fender-benders, so treat the sign as your cue to set up correctly.`,
-    quote: 'These signs mark the entrance to a roundabout. Roundabouts can also have yield, pedestrian warning, and directional arrow signs.',
-    reference: 'Washington Driver Guide (2023), 4.12: Common signs – Roundabout',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/1/19/MUTCD_W2-6.svg',
+    explanation: `Roundabout advance signs alert you early so you can pick the correct lane, drop to the 15–25 mph design speed, and prepare to yield to people already circulating and to pedestrians in the crosswalks. Entering too fast or from the wrong lane is a common source of fender-benders, so treat the sign as your cue to set up correctly.`,
+    quote:
+      'These signs mark the entrance to a roundabout. Roundabouts can also have yield, pedestrian warning, and directional arrow signs.',
+    reference:
+      'Washington Driver Guide (2023), 4.12: Common signs – Roundabout',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/1/19/MUTCD_W2-6.svg',
     imageAlt: 'MUTCD W2-6 roundabout ahead warning sign',
   },
   {
@@ -1462,11 +1577,13 @@ export const WA_QUESTIONS: Question[] = [
       'Use it exclusively for buses and carpools',
     ],
     answerIndex: 0,
-    explanation:
-      `Two-way left-turn lanes create a shared refuge for drivers turning in either direction, but they only work if everyone uses them briefly and solely for turning. Enter the lane just ahead of your turn, scan for opposing turners doing the same, and never cruise or pass within that center lane because it belongs to vehicles making lefts and U-turns (when permitted).`,
-    quote: 'This sign indicates where a lane is reserved for left-turning vehicles from either direction and isn’t to be used for through traffic or passing other vehicles. Arrows are often painted on the road.',
-    reference: 'Washington Driver Guide (2023), 4.12: Common signs – Shared center lane left turn only',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/0/09/MUTCD_R3-9a.svg',
+    explanation: `Two-way left-turn lanes create a shared refuge for drivers turning in either direction, but they only work if everyone uses them briefly and solely for turning. Enter the lane just ahead of your turn, scan for opposing turners doing the same, and never cruise or pass within that center lane because it belongs to vehicles making lefts and U-turns (when permitted).`,
+    quote:
+      'This sign indicates where a lane is reserved for left-turning vehicles from either direction and isn’t to be used for through traffic or passing other vehicles. Arrows are often painted on the road.',
+    reference:
+      'Washington Driver Guide (2023), 4.12: Common signs – Shared center lane left turn only',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/0/09/MUTCD_R3-9a.svg',
     imageAlt: 'MUTCD R3-9a two-way left turn only sign',
   },
   {
@@ -1479,12 +1596,12 @@ export const WA_QUESTIONS: Question[] = [
       'Stop and wait for an escort vehicle even if traffic is flowing',
     ],
     answerIndex: 0,
-    explanation:
-      `Orange work-zone placards mean people, equipment, cones, or lane shifts are close to live traffic. Ease off the throttle, follow any posted temporary speed, stay alert for flaggers, and remember Washington automatically doubles certain fines when workers are present—speeding or aggressive driving around crews is both illegal and life-threatening.`,
+    explanation: `Orange work-zone placards mean people, equipment, cones, or lane shifts are close to live traffic. Ease off the throttle, follow any posted temporary speed, stay alert for flaggers, and remember Washington automatically doubles certain fines when workers are present—speeding or aggressive driving around crews is both illegal and life-threatening.`,
     quote:
       'These construction, maintenance, or emergency operations signs warn you people are working near the roadway. Motorists, pedestrians, and bicyclists must yield to any highway construction personnel... Fines double for offenses committed while driving in construction areas when workers are present.',
     reference: 'Washington Driver Guide (2023), 4.12: Work zone signs',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/MUTCD_CW20-1.svg',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/b/ba/MUTCD_CW20-1.svg',
     imageAlt: 'MUTCD CW20-1 Road Work Ahead sign',
   },
   {
@@ -1497,16 +1614,16 @@ export const WA_QUESTIONS: Question[] = [
       'A toll must be paid immediately',
     ],
     answerIndex: 0,
-    explanation:
-      `Blue service markers are your clue to essential stops—hospitals, emergency care, fuel, food, EV charging, or rest areas—so you can anticipate exits safely instead of braking suddenly. Spotting them early is especially important when transporting injured passengers or when your vehicle range is low.`,
-    quote: 'Service signs show the location of various services, such as hospitals, electric vehicle charging stations, and rest areas.',
+    explanation: `Blue service markers are your clue to essential stops—hospitals, emergency care, fuel, food, EV charging, or rest areas—so you can anticipate exits safely instead of braking suddenly. Spotting them early is especially important when transporting injured passengers or when your vehicle range is low.`,
+    quote:
+      'Service signs show the location of various services, such as hospitals, electric vehicle charging stations, and rest areas.',
     reference: 'Washington Driver Guide (2023), 4.12: Service signs',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/f/fd/MUTCD_D9-2.svg',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/f/fd/MUTCD_D9-2.svg',
     imageAlt: 'MUTCD D9-2 blue hospital service sign',
   },
   {
     id: 103,
-    prompt: `What does this brown recreation sign signal to drivers?`,
+    prompt: `What does this blue recreation sign signal to drivers?`,
     choices: [
       'Local recreation such as picnic areas, trailheads, or other attractions are nearby',
       'A mandatory inspection station is ahead',
@@ -1514,12 +1631,13 @@ export const WA_QUESTIONS: Question[] = [
       'Speed cameras are active on this block',
     ],
     answerIndex: 0,
-    explanation:
-      `Brown recreation or cultural signs point toward parks, picnic areas, trailheads, campgrounds, and other attractions where slower traffic, pedestrians, and people towing trailers are common. Use them as advance notice to ease off the gas, check mirrors for following vehicles, and time your turn without surprising traffic behind you.`,
-    quote: 'Recreation signs show local attractions, such as hiking trails, picnic spaces, and skiing areas.',
+    explanation: `Blue recreation or cultural signs point toward parks, picnic areas, trailheads, campgrounds, and other attractions where slower traffic, pedestrians, and people towing trailers are common. Use them as advance notice to ease off the gas, check mirrors for following vehicles, and time your turn without surprising traffic behind you.`,
+    quote:
+      'Recreation signs show local attractions, such as hiking trails, picnic spaces, and skiing areas.',
     reference: 'Washington Driver Guide (2023), 4.12: Recreation signs',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/0/03/MUTCD_D9-7.svg',
-    imageAlt: 'MUTCD D9-7 brown picnic area recreation sign',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/0/0a/MUTCD_D5-10.svg',
+    imageAlt: 'MUTCD D5-10 blue picnic area recreation sign',
   },
   {
     id: 104,
@@ -1531,12 +1649,12 @@ export const WA_QUESTIONS: Question[] = [
       'They display the minimum speed you must maintain',
     ],
     answerIndex: 0,
-    explanation:
-      `Green guide panels provide the big-picture navigation—distance and direction to upcoming cities, airports, state lines, or major exits—so you can choose the right lane, plan fuel stops, or confirm you’re on the correct highway. Reading them early reduces last-second weaving across lanes.`,
+    explanation: `Green guide panels provide the big-picture navigation—distance and direction to upcoming cities, airports, state lines, or major exits—so you can choose the right lane, plan fuel stops, or confirm you’re on the correct highway. Reading them early reduces last-second weaving across lanes.`,
     quote:
       'Destination signs show directions and distances to various locations, such as cities, airports, or state lines or special areas such as national parks, historical areas, or museums.',
     reference: 'Washington Driver Guide (2023), 4.12: Destination signs',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/0/03/MUTCD_D1-1b.svg',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/0/03/MUTCD_D1-1b.svg',
     imageAlt: 'MUTCD D1-1b green destination sign pointing toward city names',
   },
   {
@@ -1549,12 +1667,13 @@ export const WA_QUESTIONS: Question[] = [
       'You must photograph every crash you see',
     ],
     answerIndex: 0,
-    explanation:
-      `Photo Enforced notices are legally required so you know automated cameras are monitoring that signal, railroad crossing, or school-zone speed. Treat them as a reminder to come to full stops, obey flashing lights, and stay within the posted speed because any violation is captured and mailed to the registered owner even if police aren’t on scene.`,
+    explanation: `Photo Enforced notices are legally required so you know automated cameras are monitoring that signal, railroad crossing, or school-zone speed. Treat them as a reminder to come to full stops, obey flashing lights, and stay within the posted speed because any violation is captured and mailed to the registered owner even if police aren’t on scene.`,
     quote:
       'These cameras automatically record images if you: • Fail to stop at a steady red light. • Fail to stop at a railroad crossing signal. • Exceed the speed limit in a school zone. All locations with traffic cameras are clearly marked. Speeding tickets from these locations are mailed to the vehicle owner.',
-    reference: 'Washington Driver Guide (2023), 4.12: Common signs – Automated traffic safety cameras',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/4/46/MUTCD_R10-19P.svg',
+    reference:
+      'Washington Driver Guide (2023), 4.12: Common signs – Automated traffic safety cameras',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/4/46/MUTCD_R10-19P.svg',
     imageAlt: 'MUTCD R10-19P photo enforced plaque',
   },
   {
@@ -1567,8 +1686,7 @@ export const WA_QUESTIONS: Question[] = [
       'They no longer need any restraint after age six',
     ],
     answerIndex: 1,
-    explanation:
-      `Children age four and older stay in a car or booster seat until the adult lap and shoulder belt fits correctly, which usually isn’t until they reach about 4'9" between ages eight and twelve.`,
+    explanation: `Children age four and older stay in a car or booster seat until the adult lap and shoulder belt fits correctly, which usually isn’t until they reach about 4'9" between ages eight and twelve.`,
     quote:
       '• Ages 4 and older must ride in a car or booster seat until the vehicle lap and shoulder seat belts fit properly— typically, between the ages of 8 and 12 years of age.',
     reference: 'Washington Driver Guide (2023), 2.6: Child seats',
@@ -1583,13 +1701,14 @@ export const WA_QUESTIONS: Question[] = [
       'Borrow someone else’s placard for convenience if the lot is full',
     ],
     answerIndex: 0,
-    explanation:
-      `Reserved accessible stalls are only for vehicles showing the proper plate or placard, and the hashed access aisle next to them must stay empty so wheelchair users and lift ramps have space to load safely.`,
+    explanation: `Reserved accessible stalls are only for vehicles showing the proper plate or placard, and the hashed access aisle next to them must stay empty so wheelchair users and lift ramps have space to load safely.`,
     quote:
       'Some parking spots are reserved for vehicles with disabled parking plates or a disabled parking placard. The white stripes next to a reserved space, called an access aisle, must be kept clear. You can be fined for parking in stalls without displaying the required placard and/or for blocking the access aisle.',
-    reference: 'Washington Driver Guide (2023), 4.18: Parking – Reserved disabled parking',
-  image: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/MUTCD_R7-8.svg',
-    imageAlt: 'MUTCD R7-8 reserved parking sign with International Symbol of Access',
+    reference:
+      'Washington Driver Guide (2023), 4.18: Parking – Reserved disabled parking',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/d/d9/MUTCD_R7-8.svg',
+    imageAlt:
+      'MUTCD R7-8 reserved parking sign with International Symbol of Access',
   },
   {
     id: 108,
@@ -1601,11 +1720,11 @@ export const WA_QUESTIONS: Question[] = [
       'Drive beside the train in the guideway so you can exit faster',
     ],
     answerIndex: 0,
-    explanation:
-      `Link trains always have the right-of-way, so drivers must hang back at least a car length, watch the signs and markings, and stay completely off the rails so the train can clear the station area.`,
+    explanation: `Link trains always have the right-of-way, so drivers must hang back at least a car length, watch the signs and markings, and stay completely off the rails so the train can clear the station area.`,
     quote:
       '• Be alert and watch for approaching light rail trains. • Leave at least 1 car length (or more) between your vehicle and light rail trains. • Do not stop, park, or leave your car on the tracks!',
-    reference: 'Washington Driver Guide (2023), 4.7: Sharing the road with trains – Light rail',
+    reference:
+      'Washington Driver Guide (2023), 4.7: Sharing the road with trains – Light rail',
   },
   {
     id: 109,
@@ -1617,11 +1736,11 @@ export const WA_QUESTIONS: Question[] = [
       'Drive faster so debris stays behind you',
     ],
     answerIndex: 0,
-    explanation:
-      `State law treats unsecured loads as illegal and dangerous, so you must lash or net the cargo directly to the trailer before pulling onto the road.`,
+    explanation: `State law treats unsecured loads as illegal and dangerous, so you must lash or net the cargo directly to the trailer before pulling onto the road.`,
     quote:
       'Secure your load so loose items don’t release into the air or slide, shift, or fall onto the road and cause a crash. • Tie everything down with rope, netting, or straps. • Tie large objects directly to your vehicle or trailer.',
-    reference: 'Washington Driver Guide (2023), 4.19: Transporting – Secure your load',
+    reference:
+      'Washington Driver Guide (2023), 4.19: Transporting – Secure your load',
   },
 ]
 

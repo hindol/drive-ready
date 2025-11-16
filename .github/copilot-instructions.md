@@ -18,7 +18,7 @@
 - Work through each checklist item systematically.
 - Keep communication concise and focused.
 - Follow development best practices.
-- Before committing, run `npm run test:secrets` (or `npm run test:prepush`) to ensure no sensitive tokens or API keys are embedded in the repo.
+- Before committing, run `npm run format` to normalize files, then `npm run test:secrets` (or `npm run test:prepush`) to ensure no sensitive tokens or API keys are embedded in the repo.
 
 ## Question Creation Rules
 

@@ -5,16 +5,33 @@
 .hero-section {
   position: relative;
   padding: 6rem 0;
-  background: linear-gradient(135deg, rgba(22, 106, 156, 0.95), rgba(24, 169, 153, 0.9));
+  background: linear-gradient(
+    135deg,
+    rgba(22, 106, 156, 0.95),
+    rgba(24, 169, 153, 0.9)
+  );
   overflow: hidden;
 }
 
 .hero-section .overlay {
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.1), transparent 55%),
-    radial-gradient(circle at 80% 30%, rgba(255, 255, 255, 0.08), transparent 60%),
-    radial-gradient(circle at 50% 80%, rgba(255, 255, 255, 0.06), transparent 65%);
+  background-image:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(255, 255, 255, 0.1),
+      transparent 55%
+    ),
+    radial-gradient(
+      circle at 80% 30%,
+      rgba(255, 255, 255, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(
+      circle at 50% 80%,
+      rgba(255, 255, 255, 0.06),
+      transparent 65%
+    );
   opacity: 0.8;
 }
 
@@ -40,7 +57,9 @@
 }
 
 .card {
-  transition: transform 150ms ease, box-shadow 150ms ease;
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .card:hover {
@@ -168,7 +187,11 @@ footer a:hover {
 .practice-day--loading {
   border-style: solid;
   border-color: rgba(22, 106, 156, 0.15);
-  background: linear-gradient(135deg, rgba(22, 106, 156, 0.08), rgba(22, 106, 156, 0.02));
+  background: linear-gradient(
+    135deg,
+    rgba(22, 106, 156, 0.08),
+    rgba(22, 106, 156, 0.02)
+  );
   animation: practiceDayPulse 1.4s ease-in-out infinite;
   color: transparent;
 }

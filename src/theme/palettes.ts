@@ -47,7 +47,9 @@ const CSS_VARIABLE_MAP: Record<keyof PaletteTokens, string> = {
 
 export const applyPalette = (
   palette: PaletteTokens,
-  target: HTMLElement | null = typeof document !== 'undefined' ? document.documentElement : null,
+  target: HTMLElement | null = typeof document !== 'undefined'
+    ? document.documentElement
+    : null,
 ): void => {
   if (!target) {
     return
@@ -58,6 +60,8 @@ export const applyPalette = (
   })
 }
 
-export const getPalette = (name: PaletteName): PaletteTokens => ({ ...PALETTES[name] })
+export const getPalette = (name: PaletteName): PaletteTokens => ({
+  ...PALETTES[name],
+})
 
 export const DEFAULT_PALETTE: PaletteName = 'ferrySignalPop'
