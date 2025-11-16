@@ -897,7 +897,7 @@ function App() {
               </div>
             ) : (
               <div className="row g-4 align-items-start">
-                <div className="col-lg-4">
+                <div className="col-lg-4 order-2 order-lg-1">
                   <div className="card h-100 border-0 shadow-sm live-score-card">
                     <div className="card-body py-2">
                       <div className="d-flex align-items-center justify-content-between gap-2 mb-1">
@@ -999,7 +999,7 @@ function App() {
                     </div>
                   </div>
                 </div>
-                <div className="col-lg-8">
+                <div className="col-lg-8 order-1 order-lg-2">
                   {testStatus === 'idle' ? (
                     <div className="card border-0 shadow-sm h-100">
                       <div className="card-body d-flex flex-column justify-content-center text-center">
