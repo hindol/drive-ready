@@ -57,6 +57,7 @@ const PRACTICE_GOAL_QUESTIONS = 10
 const PRACTICE_CALENDAR_WINDOW_RADIUS = 3
 const PRACTICE_HISTORY_STORAGE_KEY = 'driveready-practice-history-v1'
 const LEGACY_PRACTICE_HISTORY_STORAGE_KEY = 'drivingtestapp-practice-history-v1'
+const EMPTY_REVIEW_DATA: Record<number, ReviewCard> = {}
 
 type PersistedTestState = {
   status: 'idle' | 'in-progress' | 'complete'
@@ -265,7 +266,7 @@ const computePracticeStreak = (history: PracticeHistory): number => {
 function App() {
   const stateCode: SupportedStateCode = ACTIVE_STATE_CODE
   const content = washingtonContent
-  const activeQuestionBank = questionBank[stateCode] ?? []
+  const activeQuestionBank = useMemo(() => questionBank[stateCode] ?? [], [stateCode])
   const questionTargetCount = activeQuestionBank.length ? Math.min(QUESTIONS_PER_ATTEMPT, activeQuestionBank.length) : 0
   const [testStatus, setTestStatus] = useState<'idle' | 'in-progress' | 'complete'>('idle')
   const [testQuestions, setTestQuestions] = useState<Question[]>([])
@@ -402,7 +403,7 @@ function App() {
     if (usedLegacySessionKey) {
       window.localStorage.removeItem(LEGACY_SESSION_STORAGE_KEY)
     }
-  }, [])
+  }, [stateCode])
 
   useEffect(() => {
     if (typeof window === 'undefined' || !isPracticeHistoryHydrated) {
@@ -480,7 +481,7 @@ function App() {
   const canAdvance = currentQuestion ? responses[currentQuestion.id] !== undefined : false
   const canNavigateForward = testStatus === 'complete' ? !isLastQuestion : canAdvance
   const selectedAnswerIndex = currentQuestion ? responses[currentQuestion.id] : undefined
-  const activeReviewData = reviewStore[stateCode] ?? {}
+  const activeReviewData = useMemo(() => reviewStore[stateCode] ?? EMPTY_REVIEW_DATA, [reviewStore, stateCode])
   const dueQuestions = useMemo(() => {
     const todayTime = getStartOfToday().getTime()
     const dueList: { question: Question; dueTime: number }[] = []
@@ -1164,12 +1165,10 @@ function App() {
                               </div>
                             )}
                             {currentQuestion.image && (
-                              <div className="mb-3">
+                              <div className="question-image-frame">
                                 <img
                                   src={currentQuestion.image}
                                   alt={currentQuestion.imageAlt ?? 'Road sign illustration'}
-                                  className="img-fluid rounded border"
-                                  style={{ maxWidth: '260px' }}
                                 />
                               </div>
                             )}
@@ -1354,18 +1353,16 @@ function App() {
                           </button>
                         </div>
                         {reviewInProgressQuestion.image && (
-                          <div className="mb-3">
+                          <div className="question-image-frame">
                             <img
                               src={reviewInProgressQuestion.image}
                               alt={reviewInProgressQuestion.imageAlt ?? 'Road sign illustration'}
-                              className="img-fluid rounded border"
-                              style={{ maxWidth: '260px' }}
                             />
                           </div>
                         )}
                         <h3 className="h5 fw-semibold mb-3">{reviewInProgressQuestion.prompt}</h3>
                         <div className="list-group mb-4">
-                          {reviewInProgressQuestion.choices.map((choice, index) => {
+                          {reviewInProgressQuestion.choices.map((choice: string, index: number) => {
                             const isCorrectChoice = index === reviewInProgressQuestion.answerIndex
                             const isUserSelection = reviewSelectedChoice === index
                             const showReveal = reviewRevealed

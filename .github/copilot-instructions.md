@@ -22,13 +22,13 @@
 
 ## Question Creation Rules
 
-- Base every prompt, explanation, and citation on Washington-specific sources—prefer the 2023 Washington Driver Guide or an official DOL fact sheet—and keep the law/regulation wording exact for local accuracy.
+- Base every prompt, explanation, and citation on Washington-specific sources—prefer the 2023 Washington Driver Guide or an official DOL fact sheet—and keep the law/regulation wording exact for local accuracy. Treat the text-only guide at https://dol.wa.gov/driver-licenses-and-permits/driver-training-and-testing/driver-guides/washington-state-driver-guide-text-only as the authoritative source of truth for citations.
 - Give each `Question` object a unique sequential `id`, a clear prompt, exactly four plausible answer choices (strings only—no letter prefixes), and a single correct response referenced by `answerIndex` (0-based).
 - Pair every question with:
 	- An `explanation` that restates the correct behavior in plain language for learners.
 	- A verbatim `quote` from the cited source supporting the rule being tested.
 	- A `reference` string in the format `Washington Driver Guide (2023), <section>` so `getReferenceLink` can build a URL.
-- When covering signs or signals, use the official MUTCD SVG assets stored under `src/assets/signs/` (download via authoritative sources, never AI-generated art) and wire them through the `ROAD_SIGNS` map with descriptive `image` + `imageAlt` (include the MUTCD code in the alt text for screen readers).
+- When covering signs or signals, do **not** download new assets. Instead, pull direct Wikimedia image URLs from the official Road signs in the United States gallery (https://en.wikipedia.org/wiki/Road_signs_in_the_United_States) and reference those HTTPS links in your question objects. Keep using descriptive `image` + `imageAlt` fields (include the MUTCD code in the alt text for screen readers) so assistive tech still identifies the sign correctly. Use the canonical asset path (for example, https://upload.wikimedia.org/wikipedia/commons/4/40/MUTCD_R4-7.svg) and avoid thumbnail links that contain `/thumb/` in the URL since those often break or change sizes.
 - If an appropriate official asset does not exist, reframe the prompt as a word problem instead of fabricating inaccurate artwork.
 - Never create bespoke illustrations or icons—only use assets sourced from official MUTCD, Washington DOL, or other authoritative public-domain/licensed sets. If a trustworthy asset is unavailable, keep the question text-only.
 - Keep the bank balanced: continuously expand across traffic laws, signals/signs, safe driving techniques, sharing the road (bikes, transit, vulnerable users), licensing/responsibility, emergencies, and weather/mountain driving so the 100-question set mirrors the Washington exam outline.
