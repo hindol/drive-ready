@@ -43,7 +43,7 @@ test.describe('Mock test experience', () => {
     await expect(reviewAlert).toBeVisible()
   })
 
-  test('increments the Daily 10-question habit by one per answered question', async ({ page }, testInfo) => {
+  test('increments the Daily 10-question habit by one per answered question', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Start Mock Test' }).click()
 
@@ -57,10 +57,9 @@ test.describe('Mock test experience', () => {
     })
     await habitCard.scrollIntoViewIfNeeded()
     await expect(habitCard).toContainText('1 / 10 questions')
-    await captureLocatorScreenshot(habitCard, testInfo, 'habit-card.png')
   })
 
-  test('counts toward the Daily 10-question habit after finishing a set', async ({ page }) => {
+  test('counts toward the Daily 10-question habit after finishing a set', async ({ page }, testInfo) => {
     const practiceGoal = 3
     const questionCount = 3
     await page.goto(`/?practiceGoal=${practiceGoal}&mockQuestions=${questionCount}`)
@@ -95,5 +94,8 @@ test.describe('Mock test experience', () => {
     await expect(habitCard).toContainText(
       `We already logged today’s ${practiceGoal} solved questions.`,
     )
+    const metDay = habitCard.locator('.practice-calendar .practice-day--met')
+    await expect(metDay).toHaveCount(1, { timeout: 15000 })
+    await captureLocatorScreenshot(habitCard, testInfo, 'habit-card.png')
   })
 })
