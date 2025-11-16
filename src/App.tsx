@@ -55,6 +55,8 @@ const SESSION_STORAGE_KEY = 'driveready-session-v1'
 const LEGACY_SESSION_STORAGE_KEY = 'drivingtestapp-session-v1'
 const PRACTICE_GOAL_QUESTIONS = 10
 const PRACTICE_CALENDAR_WINDOW_RADIUS = 3
+const PRACTICE_HISTORY_STORAGE_KEY = 'driveready-practice-history-v1'
+const LEGACY_PRACTICE_HISTORY_STORAGE_KEY = 'drivingtestapp-practice-history-v1'
 
 type PersistedTestState = {
   status: 'idle' | 'in-progress' | 'complete'
@@ -281,10 +283,12 @@ function App() {
   const [sessionId, setSessionId] = useState('')
   const [isHydratingSession, setIsHydratingSession] = useState(true)
   const [isReviewStoreHydrated, setIsReviewStoreHydrated] = useState(false)
+  const [isPracticeHistoryHydrated, setIsPracticeHistoryHydrated] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') {
       setIsHydratingSession(false)
+      setIsPracticeHistoryHydrated(true)
       return
     }
     let storedSession = window.localStorage.getItem(SESSION_STORAGE_KEY)
@@ -353,19 +357,61 @@ function App() {
       }
     }
 
+    let storedPracticeHistory = window.localStorage.getItem(PRACTICE_HISTORY_STORAGE_KEY)
+    let usedLegacyPracticeHistoryKey = false
+    if (!storedPracticeHistory) {
+      storedPracticeHistory = window.localStorage.getItem(LEGACY_PRACTICE_HISTORY_STORAGE_KEY)
+      if (storedPracticeHistory) {
+        usedLegacyPracticeHistoryKey = true
+      }
+    }
+    let dedicatedPracticeHistory: PracticeHistory = {}
+    if (storedPracticeHistory) {
+      try {
+        const parsed = JSON.parse(storedPracticeHistory) as PracticeHistory
+        if (parsed && typeof parsed === 'object') {
+          dedicatedPracticeHistory = parsed
+          if (usedLegacyPracticeHistoryKey) {
+            window.localStorage.setItem(PRACTICE_HISTORY_STORAGE_KEY, JSON.stringify(parsed))
+            window.localStorage.removeItem(LEGACY_PRACTICE_HISTORY_STORAGE_KEY)
+          }
+        }
+      } catch {
+        window.localStorage.removeItem(PRACTICE_HISTORY_STORAGE_KEY)
+        window.localStorage.removeItem(LEGACY_PRACTICE_HISTORY_STORAGE_KEY)
+      }
+    }
     const persistedPracticeHistory =
       parsedSession.practiceHistory && typeof parsedSession.practiceHistory === 'object'
         ? parsedSession.practiceHistory
         : {}
-    setPracticeHistory(persistedPracticeHistory)
+    const mergedPracticeHistory = { ...persistedPracticeHistory, ...dedicatedPracticeHistory }
+    setPracticeHistory((previous) => {
+      if (!Object.keys(previous).length) {
+        return mergedPracticeHistory
+      }
+      return { ...mergedPracticeHistory, ...previous }
+    })
+    setIsPracticeHistoryHydrated(true)
 
     setIsHydratingSession(false)
-    const normalizedSession = { ...parsedSession, stateCode: persistedStateCode, practiceHistory: persistedPracticeHistory }
+    const normalizedSession = { ...parsedSession, stateCode: persistedStateCode, practiceHistory: mergedPracticeHistory }
     window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(normalizedSession))
     if (usedLegacySessionKey) {
       window.localStorage.removeItem(LEGACY_SESSION_STORAGE_KEY)
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !isPracticeHistoryHydrated) {
+      return
+    }
+    if (!Object.keys(practiceHistory).length) {
+      window.localStorage.removeItem(PRACTICE_HISTORY_STORAGE_KEY)
+      return
+    }
+    window.localStorage.setItem(PRACTICE_HISTORY_STORAGE_KEY, JSON.stringify(practiceHistory))
+  }, [practiceHistory, isPracticeHistoryHydrated])
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -418,6 +464,7 @@ function App() {
     const completedDays = days.filter((day) => day.questions >= PRACTICE_GOAL_QUESTIONS).length
     return { days, completedDays, totalDays: days.length }
   }, [practiceHistory])
+  const isPracticeCalendarHydrating = isHydratingSession || !isPracticeHistoryHydrated
   const todayGoalPercent = Math.min(
     100,
     Math.round((Math.min(todayQuestionCount, PRACTICE_GOAL_QUESTIONS) / PRACTICE_GOAL_QUESTIONS) * 100),
@@ -914,7 +961,7 @@ function App() {
                         aria-valuemax={100}
                       >
                         <div
-                          className={`progress-bar ${progressPercent >= 80 ? 'bg-success' : 'bg-primary'}`}
+                          className="progress-bar bg-primary"
                           style={{ width: `${hasActiveTest ? progressPercent : 0}%` }}
                         />
                       </div>
@@ -969,31 +1016,45 @@ function App() {
                             {practiceCalendar.completedDays}/{practiceCalendar.totalDays}
                           </span>
                         </p>
-                        <div className="practice-calendar-grid">
-                          {practiceCalendar.days.map((day) => {
-                            const isMet = day.questions >= PRACTICE_GOAL_QUESTIONS
-                            const dayClasses = ['practice-day']
-                            if (isMet) {
-                              dayClasses.push('practice-day--met')
-                            }
-                            if (day.isToday) {
-                              dayClasses.push('practice-day--today')
-                            }
-                            if (day.isFuture) {
-                              dayClasses.push('practice-day--future')
-                            }
-                            if (day.isPast && !isMet) {
-                              dayClasses.push('practice-day--missed')
-                            }
-                            return (
-                              <span key={day.key} className={dayClasses.join(' ')}>
-                                <span className="practice-day-letter">
-                                  {day.date.toLocaleDateString(undefined, { weekday: 'narrow' })}
-                                </span>
-                                <span className="practice-day-date">{day.date.getDate()}</span>
-                              </span>
-                            )
-                          })}
+                        <div className="practice-calendar-grid" aria-live="polite">
+                          {isPracticeCalendarHydrating
+                            ? Array.from({ length: PRACTICE_CALENDAR_WINDOW_RADIUS * 2 + 1 }).map((_, index) => (
+                                <span
+                                  key={`practice-day-loading-${index}`}
+                                  className="practice-day practice-day--loading"
+                                  aria-hidden="true"
+                                />
+                              ))
+                            : practiceCalendar.days.map((day) => {
+                                const isMet = day.questions >= PRACTICE_GOAL_QUESTIONS
+                                const dayClasses = ['practice-day']
+                                if (isMet) {
+                                  dayClasses.push('practice-day--met')
+                                }
+                                if (day.isToday) {
+                                  dayClasses.push('practice-day--today')
+                                }
+                                if (day.isFuture) {
+                                  dayClasses.push('practice-day--future')
+                                }
+                                if (day.isPast && !isMet) {
+                                  dayClasses.push('practice-day--missed')
+                                }
+                                return (
+                                  <span key={day.key} className={dayClasses.join(' ')}>
+                                    <span className="practice-day-letter">
+                                      {day.date.toLocaleDateString(undefined, { weekday: 'narrow' })}
+                                    </span>
+                                    <span className="practice-day-date">{day.date.getDate()}</span>
+                                    {isMet && (
+                                      <>
+                                        <span className="practice-day-dot" aria-hidden="true" />
+                                        <span className="visually-hidden">Practice goal met</span>
+                                      </>
+                                    )}
+                                  </span>
+                                )
+                              })}
                         </div>
                       </div>
                     </div>
@@ -1134,11 +1195,6 @@ function App() {
                           </>
                         )}
                       </div>
-                    </div>
-                  )}
-                  {testStatus === 'complete' && totalQuestions > 0 && (
-                    <div className={`alert ${passingPercentage >= 80 ? 'alert-success' : 'alert-warning'} mt-3`} role="status">
-                      You answered {correctCount} of {totalQuestions} correctly ({passingPercentage}%).
                     </div>
                   )}
                 </div>

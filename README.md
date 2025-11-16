@@ -65,3 +65,7 @@ The Vite config automatically switches its `base` path to `/drive-ready/` when t
 ## Authentication (Clerk)
 
 DriveReady now mounts the React app inside Clerk’s provider and surfaces a modal “Admin sign in” button in the navbar. After signing in, a Clerk `UserButton` appears for quick account management. This is enough to begin protecting admin-only features; add `SignedIn` / `SignedOut` wrappers or Clerk hooks where you need to gate content.
+
+## Assets & Licensing
+
+- Favicon: “Steering wheel” by [sodruls](https://openclipart.org/detail/335908/steering-wheel) on Openclipart (public domain / CC0). Downloaded November 2025.

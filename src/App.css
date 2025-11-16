@@ -124,7 +124,7 @@ footer a:hover {
 }
 
 .practice-day {
-  min-height: 42px;
+  min-height: 56px;
   border-radius: 0.5rem;
   border: 1px dashed rgba(22, 106, 156, 0.3);
   background-color: rgba(22, 106, 156, 0.05);
@@ -134,9 +134,9 @@ footer a:hover {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0;
+  gap: 0.1rem;
   text-align: center;
-  padding: 0.25rem 0.08rem;
+  padding: 0.35rem 0.1rem;
 }
 
 .practice-day-letter {
@@ -165,6 +165,28 @@ footer a:hover {
   box-shadow: 0 0.75rem 1.5rem rgba(24, 169, 153, 0.25);
 }
 
+.practice-day--loading {
+  border-style: solid;
+  border-color: rgba(22, 106, 156, 0.15);
+  background: linear-gradient(135deg, rgba(22, 106, 156, 0.08), rgba(22, 106, 156, 0.02));
+  animation: practiceDayPulse 1.4s ease-in-out infinite;
+  color: transparent;
+}
+
+.practice-day-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+  background-color: var(--driveready-secondary);
+  display: block;
+  margin-top: 0.05rem;
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.4);
+}
+
+.practice-day--met .practice-day-dot {
+  background-color: var(--driveready-secondary);
+}
+
 .practice-day--missed {
   opacity: 0.5;
 }
@@ -177,7 +199,21 @@ footer a:hover {
 .practice-day--today {
   border-style: solid;
   border-width: 1px;
-  box-shadow: 0 0 0 2px rgba(22, 106, 156, 0.2) inset;
+  border-color: var(--driveready-primary);
+  background-color: var(--driveready-primary-muted);
+  box-shadow: 0 0 0 2px rgba(15, 78, 115, 0.2) inset;
+}
+
+@keyframes practiceDayPulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
 
 @media (max-width: 575.98px) {
