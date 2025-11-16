@@ -5,7 +5,7 @@
 .hero-section {
   position: relative;
   padding: 6rem 0;
-  background: linear-gradient(135deg, rgba(13, 110, 253, 0.9), rgba(111, 66, 193, 0.85));
+  background: linear-gradient(135deg, rgba(22, 106, 156, 0.95), rgba(24, 169, 153, 0.9));
   overflow: hidden;
 }
 
@@ -45,20 +45,25 @@
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 1.5rem 3rem rgba(13, 110, 253, 0.1);
+  box-shadow: 0 1.5rem 3rem rgba(22, 106, 156, 0.2);
 }
 
 .stat-card {
   background-color: #ffffff;
   border-radius: 1rem;
   padding: 1.75rem;
-  border-left: 4px solid #0d6efd;
+  border-left: 4px solid var(--driveready-primary);
 }
 
 .stat-value {
   font-size: 2rem;
   font-weight: 700;
-  color: #0d6efd;
+  color: var(--driveready-primary);
+}
+
+.hero-section .state-selector {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, 0.12);
 }
 
 .checklist-card .card-body {

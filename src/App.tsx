@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { Question } from './data/questions'
 import { questionBank, getReferenceLink } from './data/questions'
 import './App.css'
+import { SignedIn, SignedOut, SignInButton, SignOutButton, UserButton } from '@clerk/clerk-react'
 
 type Stat = {
   label: string
@@ -13,7 +14,6 @@ type SupportedStateCode = 'WA'
 type StateContent = {
   available: boolean
   hero: {
-    badge: string
     title: string
     description: string
   }
@@ -182,10 +182,9 @@ const ACTIVE_STATE_CODE: SupportedStateCode = 'WA'
 const washingtonContent: StateContent = {
   available: true,
   hero: {
-    badge: 'Washington DOL Pilot',
     title: 'Washington Driving Test Mock Exam Suite',
     description:
-      'Recreate the Washington DOL knowledge and driving exams with targeted study modules, detailed answer explanations, and free community resources.',
+      'Recreate Washington knowledge and driving exams with targeted study modules, detailed answer explanations, and free community resources.',
   },
   stats: [
     { label: 'Knowledge test questions', value: '40' },
@@ -195,11 +194,11 @@ const washingtonContent: StateContent = {
   checklist: [
     'Bring photo ID, proof of Washington residency, and your driver training certificate.',
     'Practice parallel parking, hill starts, and backing around a corner before exam day.',
-    'Plan to arrive 15 minutes early at your licensing office to complete paperwork.',
+  'Plan to arrive 15 minutes early at your testing location to complete paperwork.',
     'Review Right of Way rules for four-way stops and flashing yellow arrows.',
     'Confirm that your testing vehicle meets safety requirements and has valid insurance.',
   ],
-  supportNote: 'Aligned with the Washington State Department of Licensing exam blueprint.',
+  supportNote: 'Aligned with Washington driver testing guidelines.',
 }
 
 const QUESTIONS_PER_ATTEMPT = 10
@@ -207,7 +206,6 @@ const QUESTIONS_PER_ATTEMPT = 10
 function App() {
   const stateCode: SupportedStateCode = ACTIVE_STATE_CODE
   const content = washingtonContent
-  const navCta = { href: '#mock-test', text: 'Start Mock Test' }
   const activeQuestionBank = questionBank[stateCode] ?? []
   const questionTargetCount = activeQuestionBank.length ? Math.min(QUESTIONS_PER_ATTEMPT, activeQuestionBank.length) : 0
   const [testStatus, setTestStatus] = useState<'idle' | 'in-progress' | 'complete'>('idle')
@@ -709,9 +707,28 @@ function App() {
                 </a>
               </li>
             </ul>
-            <a className="btn btn-outline-light ms-lg-3" href={navCta.href}>
-              {navCta.text}
-            </a>
+            <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-2 ms-lg-3">
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <button className="btn btn-light text-primary border-0 shadow-sm fw-semibold w-100 w-lg-auto" type="button">
+                    Admin Sign In
+                  </button>
+                </SignInButton>
+              </SignedOut>
+              <SignedIn>
+                <div className="d-flex flex-column flex-lg-row align-items-lg-center gap-2 w-100 w-lg-auto">
+                  <SignOutButton redirectUrl="/">
+                    <button className="btn btn-outline-light fw-semibold w-100" type="button">
+                      Logout
+                    </button>
+                  </SignOutButton>
+                  <UserButton
+                    afterSignOutUrl="/"
+                    appearance={{ elements: { userButtonAvatarBox: { width: '36px', height: '36px' } } }}
+                  />
+                </div>
+              </SignedIn>
+            </div>
           </div>
         </div>
       </nav>
@@ -722,7 +739,6 @@ function App() {
           <div className="container position-relative">
             <div className="row justify-content-center">
               <div className="col-lg-9">
-                <span className="badge rounded-pill text-bg-warning text-dark mb-3">{content.hero.badge}</span>
                 <h1 className="display-5 fw-bold mb-3">{content.hero.title}</h1>
                 <p className="lead mb-4">{content.hero.description}</p>
                 <div className="state-selector card border-0 shadow-sm mx-auto">
@@ -730,7 +746,7 @@ function App() {
                     <p className="text-uppercase small fw-semibold text-primary mb-1">Mock exam state</p>
                     <p className="h4 fw-bold mb-2">Washington</p>
                     <p className="text-muted mb-3">
-                      DriveReady currently focuses on the Washington State Department of Licensing written exam. Additional states will ship later.
+                      DriveReady currently focuses on Washington's written knowledge exam. Additional states will ship later.
                     </p>
                     <a className="btn btn-lg btn-primary" href="#mock-test">
                       Start Practicing
