@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { capturePageScreenshot } from './utils/doc-screenshots'
 
 const clearState = async (page: Page) => {
   await page.addInitScript(() => {
@@ -12,7 +13,7 @@ test.describe('Smart Review experience', () => {
     await clearState(page)
   })
 
-  test('runs a review session end-to-end', async ({ page }) => {
+  test('runs a review session end-to-end', async ({ page }, testInfo) => {
     await page.goto('/')
     await page.locator('#review').scrollIntoViewIfNeeded()
     const startButton = page.getByRole('button', { name: 'Start Smart Review' })
@@ -26,6 +27,7 @@ test.describe('Smart Review experience', () => {
     await firstChoice.click()
     const explanationAlert = page.locator('#review .alert-info').first()
     await expect(explanationAlert).toContainText('Explanation:', { timeout: 10000 })
+  await capturePageScreenshot(page, testInfo, 'smart-review.png')
 
     await page.getByRole('button', { name: 'Good' }).click()
     await expect(

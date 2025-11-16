@@ -1,5 +1,6 @@
 import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
+import { captureLocatorScreenshot, capturePageScreenshot } from './utils/doc-screenshots'
 
 const getTodayPracticeCount = async (page: Page) => {
   return page.evaluate(() => {
@@ -24,7 +25,7 @@ test.describe('Mock test experience', () => {
     })
   })
 
-  test('shows explanation after answering and only surfaces review alert on repeat view', async ({ page }) => {
+  test('shows explanation after answering and only surfaces review alert on repeat view', async ({ page }, testInfo) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Start Mock Test' }).click()
 
@@ -34,13 +35,14 @@ test.describe('Mock test experience', () => {
     const firstChoice = page.locator('.list-group .list-group-item').first()
     await firstChoice.click()
     await expect(page.locator('.alert-info')).toContainText('Explanation:')
+  await capturePageScreenshot(page, testInfo, 'mock-test-question.png')
 
     await page.getByRole('button', { name: /Save & Next|Finish Test/ }).click()
     await page.getByRole('button', { name: 'Previous Question' }).click()
     await expect(reviewAlert).toBeVisible()
   })
 
-  test('increments the Daily 10-question habit by one per answered question', async ({ page }) => {
+  test('increments the Daily 10-question habit by one per answered question', async ({ page }, testInfo) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Start Mock Test' }).click()
 
@@ -54,6 +56,7 @@ test.describe('Mock test experience', () => {
     })
     await habitCard.scrollIntoViewIfNeeded()
     await expect(habitCard).toContainText('1 / 10 questions')
+    await captureLocatorScreenshot(habitCard, testInfo, 'habit-card.png')
   })
 
   test('counts toward the Daily 10-question habit after finishing a set', async ({ page }) => {

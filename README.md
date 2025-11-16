@@ -21,6 +21,11 @@ DriveReady delivers a Washington-focused mock driving test experience while layi
 - **Responsive theming** – Custom palette layered on Bootstrap overrides (hero gradient, button states, calendar tokens) for consistent branding.
 - **Accessibility considerations** – Semantic Bootstrap components, focus-visible buttons, and alt text for MUTCD sign assets.
 - **UI test coverage** – Playwright test suite exercises hero/nav rendering and the reset modal in Chromium, Firefox, and WebKit through the shared config.
+- **User documentation snapshots** – Playwright-powered screenshots feed `docs/user-guide.md`, keeping all user flows illustrated with current UI captures.
+
+## User Documentation
+
+- [DriveReady User Guide](docs/user-guide.md) – step-by-step walkthroughs (landing, mock tests, habit tracking, Smart Review, and resets) paired with auto-generated screenshots stored in `docs/screenshots/`.
 
 ## Getting Started
 
