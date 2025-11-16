@@ -34,9 +34,9 @@ test.describe('Mock test experience', () => {
 
     const firstChoice = page.locator('.list-group .list-group-item').first()
     await firstChoice.click()
-  await expect(page.locator('.alert-info')).toContainText('Explanation:')
-  const mockTestCard = page.locator('#mock-test .card.border-0.shadow-sm').first()
-  await captureLocatorScreenshot(mockTestCard, testInfo, 'mock-test-question.png')
+    await expect(page.locator('.alert-info')).toContainText('Explanation:')
+    const mockTestSection = page.locator('#mock-test')
+    await captureLocatorScreenshot(mockTestSection, testInfo, 'mock-test-question.png')
 
     await page.getByRole('button', { name: /Save & Next|Finish Test/ }).click()
     await page.getByRole('button', { name: 'Previous Question' }).click()
@@ -62,6 +62,16 @@ test.describe('Mock test experience', () => {
   test('counts toward the Daily 10-question habit after finishing a set', async ({ page }, testInfo) => {
     const practiceGoal = 3
     const questionCount = 3
+    const yesterday = new Date()
+    yesterday.setDate(yesterday.getDate() - 1)
+    const yesterdayKey = yesterday.toISOString().slice(0, 10)
+    await page.addInitScript((payload: { key: string; goal: number }) => {
+      const { key, goal } = payload
+      const existing = window.localStorage.getItem('driveready-practice-history-v1')
+      const parsed = existing ? (JSON.parse(existing) as Record<string, number>) : {}
+      parsed[key] = goal
+      window.localStorage.setItem('driveready-practice-history-v1', JSON.stringify(parsed))
+    }, { key: yesterdayKey, goal: practiceGoal })
     await page.goto(`/?practiceGoal=${practiceGoal}&mockQuestions=${questionCount}`)
     await page.getByRole('button', { name: 'Start Mock Test' }).click()
 
@@ -94,7 +104,22 @@ test.describe('Mock test experience', () => {
     await expect(habitCard).toContainText(
       `We already logged today’s ${practiceGoal} solved questions.`,
     )
-    const metDay = habitCard.locator('.practice-calendar .practice-day--met')
+    const seededHistoryCount = await page.evaluate(({ key }) => {
+      const stored = window.localStorage.getItem('driveready-practice-history-v1')
+      if (!stored) {
+        return null
+      }
+      try {
+        const parsed = JSON.parse(stored) as Record<string, number>
+        return parsed[key] ?? null
+      } catch {
+        return null
+      }
+    }, { key: yesterdayKey })
+    expect(seededHistoryCount).toBe(practiceGoal)
+    const metDay = habitCard.locator(
+      '.practice-calendar .practice-day.practice-day--met:not(.practice-day--today)',
+    )
     await expect(metDay).toHaveCount(1, { timeout: 15000 })
     await captureLocatorScreenshot(habitCard, testInfo, 'habit-card.png')
   })

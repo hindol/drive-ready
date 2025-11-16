@@ -145,8 +145,8 @@ footer a:hover {
 .practice-day {
   min-height: 56px;
   border-radius: 0.5rem;
-  border: 1px dashed rgba(22, 106, 156, 0.3);
-  background-color: rgba(22, 106, 156, 0.05);
+  border: 1px dashed rgba(22, 106, 156, 0.25);
+  background-color: var(--driveready-accent);
   color: var(--driveready-primary-dark);
   font-weight: 600;
   display: flex;
@@ -178,10 +178,8 @@ footer a:hover {
 }
 
 .practice-day--met {
-  background-color: var(--driveready-secondary);
-  border-color: var(--driveready-secondary);
-  color: #ffffff;
-  box-shadow: 0 0.75rem 1.5rem rgba(24, 169, 153, 0.25);
+  border-color: rgba(24, 169, 153, 0.45);
+  box-shadow: 0 0.5rem 1rem rgba(24, 169, 153, 0.12);
 }
 
 .practice-day--loading {
@@ -211,12 +209,14 @@ footer a:hover {
 }
 
 .practice-day--missed {
-  opacity: 0.5;
+  opacity: 1;
+  border-color: rgba(15, 78, 115, 0.2);
 }
 
 .practice-day--future {
   border-style: dotted;
-  opacity: 0.7;
+  border-color: rgba(15, 78, 115, 0.2);
+  opacity: 0.8;
 }
 
 .practice-day--today {
@@ -230,6 +230,12 @@ footer a:hover {
 .practice-day--today.practice-day--met,
 .practice-day--today.practice-day--met .practice-day-date {
   color: var(--driveready-primary-dark);
+}
+
+.practice-day--today.practice-day--met {
+  background-color: var(--driveready-primary-muted);
+  border-color: var(--driveready-primary);
+  box-shadow: 0 0 0 2px rgba(15, 78, 115, 0.2) inset;
 }
 
 .reset-progress-cta {
