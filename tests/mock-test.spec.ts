@@ -1,4 +1,20 @@
-import { expect, test } from '@playwright/test'
+import { expect, test, Page } from '@playwright/test'
+
+const getTodayPracticeCount = async (page: Page) => {
+  return page.evaluate(() => {
+    const todayKey = new Date().toISOString().slice(0, 10)
+    try {
+      const stored = window.localStorage.getItem('driveready-practice-history-v1')
+      if (!stored) {
+        return 0
+      }
+      const parsed = JSON.parse(stored) as Record<string, number>
+      return parsed[todayKey] ?? 0
+    } catch {
+      return 0
+    }
+  })
+}
 
 test.describe('Mock test experience', () => {
   test.beforeEach(async ({ page }) => {
@@ -23,30 +39,56 @@ test.describe('Mock test experience', () => {
     await expect(reviewAlert).toBeVisible()
   })
 
-  test('counts toward the Daily 10-question habit after finishing a set', async ({ page }) => {
+  test('increments the Daily 10-question habit by one per answered question', async ({ page }) => {
     await page.goto('/')
     await page.getByRole('button', { name: 'Start Mock Test' }).click()
 
-    for (let index = 0; index < 10; index += 1) {
+    const choice = page.locator('.list-group .list-group-item').first()
+    await expect(choice).toBeEnabled()
+    await choice.click()
+    await expect.poll(async () => getTodayPracticeCount(page)).toBe(1)
+
+    const habitCard = page.locator('.card', {
+      has: page.getByRole('heading', { name: 'Daily 10-question habit' }),
+    })
+    await habitCard.scrollIntoViewIfNeeded()
+    await expect(habitCard).toContainText('1 / 10 questions')
+  })
+
+  test('counts toward the Daily 10-question habit after finishing a set', async ({ page }) => {
+    const practiceGoal = 3
+    const questionCount = 3
+    await page.goto(`/?practiceGoal=${practiceGoal}&mockQuestions=${questionCount}`)
+    await page.getByRole('button', { name: 'Start Mock Test' }).click()
+
+    for (let answered = 0; answered < questionCount; answered += 1) {
       const choice = page.locator('.list-group .list-group-item').first()
-      await choice.waitFor()
+      await expect(choice).toBeEnabled({ timeout: 10000 })
       await choice.click()
       const actionButton = page.getByRole('button', {
         name: /Save & Next|Finish Test|Review Complete/,
       })
       await actionButton.waitFor()
-      if (!(await actionButton.isEnabled())) {
-        break
-      }
+      await expect(actionButton).toBeEnabled({ timeout: 10000 })
       await actionButton.click()
+      await expect.poll(async () => getTodayPracticeCount(page), {
+        timeout: 10000,
+      }).toBeGreaterThanOrEqual(answered + 1)
     }
 
     const habitCard = page.locator('.card', {
       has: page.getByRole('heading', { name: 'Daily 10-question habit' }),
     })
     await habitCard.scrollIntoViewIfNeeded()
-    await expect(habitCard.locator('span.badge')).toHaveText(/Done/i)
-    await expect(habitCard).toContainText('10 / 10 questions')
-    await expect(habitCard).toContainText('We already logged today’s 10 solved questions.')
+    await expect(habitCard).toContainText(
+      `${practiceGoal} / ${practiceGoal} questions`,
+      { timeout: 15000 },
+    )
+    await expect(habitCard.locator('span.badge')).toHaveText(/Done/i, {
+      timeout: 15000,
+    })
+    await expect(habitCard).toContainText(
+      `We already logged today’s ${practiceGoal} solved questions.`,
+    )
   })
 })

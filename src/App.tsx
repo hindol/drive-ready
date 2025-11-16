@@ -60,6 +60,8 @@ const MIN_EASE = 1.3
 const SESSION_STORAGE_KEY = 'driveready-session-v1'
 const LEGACY_SESSION_STORAGE_KEY = 'drivingtestapp-session-v1'
 const PRACTICE_GOAL_QUESTIONS = 10
+const PRACTICE_GOAL_QUERY_PARAM = 'practiceGoal'
+const MOCK_QUESTION_COUNT_QUERY_PARAM = 'mockQuestions'
 const PRACTICE_CALENDAR_WINDOW_RADIUS = 3
 const PRACTICE_HISTORY_STORAGE_KEY = 'driveready-practice-history-v1'
 const LEGACY_PRACTICE_HISTORY_STORAGE_KEY = 'drivingtestapp-practice-history-v1'
@@ -272,13 +274,16 @@ const buildPracticeCalendar = (
   )
 }
 
-const computePracticeStreak = (history: PracticeHistory): number => {
+const computePracticeStreak = (
+  history: PracticeHistory,
+  goal: number,
+): number => {
   let streak = 0
   const cursor = new Date()
 
   while (streak < 365) {
     const key = getDateKey(cursor)
-    if ((history[key] ?? 0) >= PRACTICE_GOAL_QUESTIONS) {
+    if ((history[key] ?? 0) >= goal) {
       streak += 1
       cursor.setDate(cursor.getDate() - 1)
     } else {
@@ -292,12 +297,53 @@ const computePracticeStreak = (history: PracticeHistory): number => {
 function App() {
   const stateCode: SupportedStateCode = ACTIVE_STATE_CODE
   const content = washingtonContent
-  const activeQuestionBank = useMemo(
+  const activeQuestionBank = useMemo<Question[]>(
     () => questionBank[stateCode] ?? [],
     [stateCode],
   )
+  const practiceGoalTarget = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return PRACTICE_GOAL_QUESTIONS
+    }
+    const params = new URLSearchParams(window.location.search)
+    const overrideValue = params.get(PRACTICE_GOAL_QUERY_PARAM)
+    if (!overrideValue) {
+      return PRACTICE_GOAL_QUESTIONS
+    }
+    const parsed = Number(overrideValue)
+    if (
+      Number.isFinite(parsed) &&
+      parsed >= 1 &&
+      parsed <= PRACTICE_GOAL_QUESTIONS
+    ) {
+      return Math.round(parsed)
+    }
+    return PRACTICE_GOAL_QUESTIONS
+  }, [])
+  const questionCountOverride = useMemo(() => {
+    if (typeof window === 'undefined') {
+      return undefined
+    }
+    const params = new URLSearchParams(window.location.search)
+    const overrideValue = params.get(MOCK_QUESTION_COUNT_QUERY_PARAM)
+    if (!overrideValue) {
+      return undefined
+    }
+    const parsed = Number(overrideValue)
+    if (
+      Number.isFinite(parsed) &&
+      parsed >= 1 &&
+      parsed <= QUESTIONS_PER_ATTEMPT
+    ) {
+      return Math.round(parsed)
+    }
+    return undefined
+  }, [])
   const questionTargetCount = activeQuestionBank.length
-    ? Math.min(QUESTIONS_PER_ATTEMPT, activeQuestionBank.length)
+    ? Math.min(
+        questionCountOverride ?? QUESTIONS_PER_ATTEMPT,
+        activeQuestionBank.length,
+      )
     : 0
   const [testStatus, setTestStatus] = useState<
     'idle' | 'in-progress' | 'complete'
@@ -362,7 +408,8 @@ function App() {
     }
     setSessionId(parsedSession.id)
     const persistedStateCode = parsedSession.stateCode ?? stateCode
-    const persistedQuestionBank = questionBank[persistedStateCode] ?? []
+    const persistedQuestionBank: Question[] =
+      questionBank[persistedStateCode] ?? []
     const questionMap = new Map<number, Question>()
     persistedQuestionBank.forEach((question) => {
       questionMap.set(question.id, question)
@@ -554,25 +601,24 @@ function App() {
     : undefined
   const todayKey = getDateKey(new Date())
   const todayQuestionCount = practiceHistory[todayKey] ?? 0
-  const hasMetPracticeGoal = todayQuestionCount >= PRACTICE_GOAL_QUESTIONS
+  const hasMetPracticeGoal = todayQuestionCount >= practiceGoalTarget
   const practiceStreak = useMemo(
-    () => computePracticeStreak(practiceHistory),
-    [practiceHistory],
+    () => computePracticeStreak(practiceHistory, practiceGoalTarget),
+    [practiceHistory, practiceGoalTarget],
   )
   const practiceCalendar = useMemo(() => {
     const days = buildPracticeCalendar(practiceHistory)
     const completedDays = days.filter(
-      (day) => day.questions >= PRACTICE_GOAL_QUESTIONS,
+      (day) => day.questions >= practiceGoalTarget,
     ).length
     return { days, completedDays, totalDays: days.length }
-  }, [practiceHistory])
+  }, [practiceHistory, practiceGoalTarget])
   const isPracticeCalendarHydrating =
     isHydratingSession || !isPracticeHistoryHydrated
   const todayGoalPercent = Math.min(
     100,
     Math.round(
-      (Math.min(todayQuestionCount, PRACTICE_GOAL_QUESTIONS) /
-        PRACTICE_GOAL_QUESTIONS) *
+      (Math.min(todayQuestionCount, practiceGoalTarget) / practiceGoalTarget) *
         100,
     ),
   )
@@ -954,23 +1000,22 @@ function App() {
     if (
       !currentQuestion ||
       testStatus === 'complete' ||
-      selectedAnswerIndex !== undefined
+      responses[currentQuestion.id] !== undefined
     ) {
       return
     }
-    setResponses((previous) => {
-      if (previous[currentQuestion.id] === undefined) {
-        const rating: ReviewRating =
-          answerIndex === currentQuestion.answerIndex ? 'good' : 'again'
-        applyReviewRating(currentQuestion.id, rating)
-        setManualAdjustments((prior) => ({
-          ...prior,
-          [currentQuestion.id]: rating,
-        }))
-        incrementDailyQuestionProgress()
-      }
-      return { ...previous, [currentQuestion.id]: answerIndex }
-    })
+    setResponses((previous) => ({
+      ...previous,
+      [currentQuestion.id]: answerIndex,
+    }))
+    const rating: ReviewRating =
+      answerIndex === currentQuestion.answerIndex ? 'good' : 'again'
+    applyReviewRating(currentQuestion.id, rating)
+    setManualAdjustments((prior) => ({
+      ...prior,
+      [currentQuestion.id]: rating,
+    }))
+    incrementDailyQuestionProgress()
   }
 
   const handleNextQuestion = () => {
@@ -1257,7 +1302,7 @@ function App() {
                           <p className="text-muted small mb-0">
                             {practiceStreak
                               ? `Current streak: ${practiceStreak} day${practiceStreak === 1 ? '' : 's'}`
-                              : 'Solve 10 questions to start your streak.'}
+                              : `Solve ${practiceGoalTarget} questions to start your streak.`}
                           </p>
                         </div>
                         <span
@@ -1270,11 +1315,8 @@ function App() {
                         <div className="d-flex justify-content-between align-items-center">
                           <span className="small text-muted">Today</span>
                           <span className="small fw-semibold">
-                            {Math.min(
-                              todayQuestionCount,
-                              PRACTICE_GOAL_QUESTIONS,
-                            )}{' '}
-                            / {PRACTICE_GOAL_QUESTIONS} questions
+                            {Math.min(todayQuestionCount, practiceGoalTarget)} /{' '}
+                            {practiceGoalTarget} questions
                           </span>
                         </div>
                         <div
@@ -1291,8 +1333,8 @@ function App() {
                         </div>
                         <small className="d-block text-muted">
                           {hasMetPracticeGoal
-                            ? 'We already logged today’s 10 solved questions. Keep the streak alive tomorrow.'
-                            : 'We log it automatically as soon as you answer 10 questions today.'}
+                            ? `We already logged today’s ${practiceGoalTarget} solved questions. Keep the streak alive tomorrow.`
+                            : `We log it automatically as soon as you answer ${practiceGoalTarget} questions today.`}
                         </small>
                       </div>
                       <div className="practice-calendar mt-2">
@@ -1319,7 +1361,7 @@ function App() {
                               ))
                             : practiceCalendar.days.map((day) => {
                                 const isMet =
-                                  day.questions >= PRACTICE_GOAL_QUESTIONS
+                                  day.questions >= practiceGoalTarget
                                 const dayClasses = ['practice-day']
                                 if (isMet) {
                                   dayClasses.push('practice-day--met')
