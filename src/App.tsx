@@ -284,6 +284,8 @@ function App() {
   const [isHydratingSession, setIsHydratingSession] = useState(true)
   const [isReviewStoreHydrated, setIsReviewStoreHydrated] = useState(false)
   const [isPracticeHistoryHydrated, setIsPracticeHistoryHydrated] = useState(false)
+  const [showResetDialog, setShowResetDialog] = useState(false)
+  const [isResettingProgress, setIsResettingProgress] = useState(false)
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -444,6 +446,10 @@ function App() {
 
   useEffect(() => {
     if (typeof window === 'undefined' || !isReviewStoreHydrated) {
+      return
+    }
+    if (!Object.keys(reviewStore).length) {
+      window.localStorage.removeItem(REVIEW_STORAGE_KEY)
       return
     }
     window.localStorage.setItem(REVIEW_STORAGE_KEY, JSON.stringify(reviewStore))
@@ -799,6 +805,55 @@ function App() {
     setCurrentQuestionIndex((previous) => previous - 1)
   }
 
+  const handleOpenResetDialog = () => {
+    setShowResetDialog(true)
+  }
+
+  const handleCloseResetDialog = () => {
+    if (isResettingProgress) {
+      return
+    }
+    setShowResetDialog(false)
+  }
+
+  const handleConfirmReset = () => {
+    if (typeof window === 'undefined') {
+      return
+    }
+    setIsResettingProgress(true)
+    try {
+      const storageKeys = [
+        SESSION_STORAGE_KEY,
+        LEGACY_SESSION_STORAGE_KEY,
+        REVIEW_STORAGE_KEY,
+        LEGACY_REVIEW_STORAGE_KEY,
+        PRACTICE_HISTORY_STORAGE_KEY,
+        LEGACY_PRACTICE_HISTORY_STORAGE_KEY,
+      ]
+      storageKeys.forEach((key) => {
+        window.localStorage.removeItem(key)
+      })
+
+      setTestStatus('idle')
+      setTestQuestions([])
+      setCurrentQuestionIndex(0)
+      setResponses({})
+      setReviewStatus('idle')
+      setReviewQueue([])
+      setReviewIndex(0)
+      setReviewRevealed(false)
+      setReviewSelectedChoice(null)
+      setReviewLog([])
+      setManualAdjustments({})
+      setReviewStore({})
+      setPracticeHistory({})
+      setSessionId(createSessionId())
+      setShowResetDialog(false)
+    } finally {
+      setIsResettingProgress(false)
+    }
+  }
+
   const questionAnswers = currentQuestion?.choices ?? []
   const remainingCount = Math.max(totalQuestions - answeredCount, 0)
   const passingPercentage = totalQuestions === 0 ? 0 : Math.round((correctCount / totalQuestions) * 100)
@@ -1056,6 +1111,15 @@ function App() {
                                 )
                               })}
                         </div>
+                      </div>
+                      <div className="reset-progress-cta border-top pt-3 mt-4">
+                        <p className="tiny-label text-muted mb-2">Need a fresh start?</p>
+                        <button className="btn btn-outline-danger w-100" type="button" onClick={handleOpenResetDialog}>
+                          Reset Progress
+                        </button>
+                        <small className="text-muted d-block mt-2">
+                          Clears your mock tests, Smart Review cards, and practice streak history.
+                        </small>
                       </div>
                     </div>
                   </div>
@@ -1463,7 +1527,51 @@ function App() {
             </div>
           </div>
         </section>
-
+        {showResetDialog && (
+          <div
+            className="reset-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-modal-title"
+            onClick={handleCloseResetDialog}
+          >
+            <div className="reset-modal-card card border-0 shadow-lg" onClick={(event) => event.stopPropagation()}>
+              <div className="card-body">
+                <div className="d-flex align-items-center gap-2 mb-3">
+                  <span className="badge text-bg-warning text-dark">Warning</span>
+                  <h3 className="h5 fw-semibold mb-0" id="reset-modal-title">
+                    Reset all saved progress?
+                  </h3>
+                </div>
+                <p className="text-muted mb-3">
+                  This wipes your mock tests, Smart Review history, adjustments, and daily practice log from this device. You
+                  will start fresh with a new session ID.
+                </p>
+                <div className="alert alert-danger" role="status">
+                  This action cannot be undone.
+                </div>
+                <div className="d-flex flex-column flex-sm-row justify-content-end gap-2">
+                  <button
+                    className="btn btn-outline-secondary"
+                    type="button"
+                    onClick={handleCloseResetDialog}
+                    disabled={isResettingProgress}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    className="btn btn-danger"
+                    type="button"
+                    onClick={handleConfirmReset}
+                    disabled={isResettingProgress}
+                  >
+                    {isResettingProgress ? 'Resetting…' : 'Erase everything'}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
   </main>
 
