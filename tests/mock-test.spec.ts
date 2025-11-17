@@ -2,9 +2,57 @@ import { expect, test } from '@playwright/test'
 import type { Page } from '@playwright/test'
 import { captureLocatorScreenshot } from './utils/doc-screenshots'
 
+declare global {
+  interface Window {
+    __drivereadySeedKeys?: string[]
+  }
+}
+
 const getTodayPracticeCount = async (page: Page) => {
   return page.evaluate(() => {
-    const todayKey = new Date().toISOString().slice(0, 10)
+    const detectTimeZone = (): string | undefined => {
+      if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+        return undefined
+      }
+      try {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone
+      } catch {
+        return undefined
+      }
+    }
+    const getSessionTimeZone = (): string | undefined => {
+      const storedSession = window.localStorage.getItem('driveready-session-v1')
+      if (!storedSession) {
+        return undefined
+      }
+      try {
+        const parsed = JSON.parse(storedSession) as { timeZone?: string }
+        return parsed.timeZone
+      } catch {
+        return undefined
+      }
+    }
+    const getDateKey = (date: Date, timeZone?: string): string => {
+      if (
+        timeZone &&
+        typeof Intl !== 'undefined' &&
+        typeof Intl.DateTimeFormat === 'function'
+      ) {
+        try {
+          return new Intl.DateTimeFormat('en-CA', {
+            timeZone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }).format(date)
+        } catch {
+          // ignore and use ISO fallback
+        }
+      }
+      return date.toISOString().slice(0, 10)
+    }
+    const timeZone = getSessionTimeZone() ?? detectTimeZone()
+    const todayKey = getDateKey(new Date(), timeZone)
     try {
       const stored = window.localStorage.getItem('driveready-practice-history-v1')
       if (!stored) {
@@ -62,22 +110,57 @@ test.describe('Mock test experience', () => {
   test('counts toward the Daily 10-question habit after finishing a set', async ({ page }, testInfo) => {
     const practiceGoal = 3
     const questionCount = 3
-    const makeDateKey = (offsetInDays: number): string => {
-      const seedDate = new Date()
-      seedDate.setHours(0, 0, 0, 0)
-      seedDate.setDate(seedDate.getDate() + offsetInDays)
-      return seedDate.toISOString().slice(0, 10)
-    }
-    const seeds = [-1, -2].map(makeDateKey)
-    await page.addInitScript((payload: { keys: string[]; goal: number }) => {
-      const { keys, goal } = payload
+    const offsets = [-1, -2]
+    await page.addInitScript((payload: { offsets: number[]; goal: number }) => {
+      const detectTimeZone = (): string | undefined => {
+        if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+          return undefined
+        }
+        try {
+          return Intl.DateTimeFormat().resolvedOptions().timeZone
+        } catch {
+          return undefined
+        }
+      }
+      const getDateKey = (date: Date, timeZone?: string): string => {
+        if (
+          timeZone &&
+          typeof Intl !== 'undefined' &&
+          typeof Intl.DateTimeFormat === 'function'
+        ) {
+          try {
+            return new Intl.DateTimeFormat('en-CA', {
+              timeZone,
+              year: 'numeric',
+              month: '2-digit',
+              day: '2-digit',
+            }).format(date)
+          } catch {
+            // ignore
+          }
+        }
+        return date.toISOString().slice(0, 10)
+      }
+      const shiftKey = (baseKey: string, offset: number): string => {
+        if (offset === 0) {
+          return baseKey
+        }
+        const cursor = new Date(`${baseKey}T00:00:00.000Z`)
+        cursor.setUTCDate(cursor.getUTCDate() + offset)
+        return cursor.toISOString().slice(0, 10)
+      }
+      const { offsets: dayOffsets, goal } = payload
+      const timeZone = detectTimeZone()
+      const baseKey = getDateKey(new Date(), timeZone)
+      const keys = dayOffsets.map((offset) => shiftKey(baseKey, offset))
       const existing = window.localStorage.getItem('driveready-practice-history-v1')
       const parsed = existing ? (JSON.parse(existing) as Record<string, number>) : {}
       keys.forEach((key) => {
         parsed[key] = goal
       })
       window.localStorage.setItem('driveready-practice-history-v1', JSON.stringify(parsed))
-    }, { keys: seeds, goal: practiceGoal })
+      window.__drivereadySeedKeys = keys
+    }, { offsets, goal: practiceGoal })
     await page.goto(`/?practiceGoal=${practiceGoal}&mockQuestions=${questionCount}`)
     await page.getByRole('button', { name: 'Start Mock Test' }).click()
 
@@ -110,19 +193,26 @@ test.describe('Mock test experience', () => {
     await expect(habitCard).toContainText(
       `We already logged today’s ${practiceGoal} solved questions.`,
     )
-    const seededHistory = await page.evaluate(({ keys }) => {
+    const { seedKeys, seedValues } = await page.evaluate<{
+      seedKeys: string[]
+      seedValues: Array<number | null> | null
+    }>(() => {
       const stored = window.localStorage.getItem('driveready-practice-history-v1')
+      const keys = window.__drivereadySeedKeys ?? []
       if (!stored) {
-        return null
+        return { seedKeys: keys, seedValues: null as number[] | null }
       }
       try {
         const parsed = JSON.parse(stored) as Record<string, number>
-        return keys.map((key) => parsed[key] ?? null)
+        return {
+          seedKeys: keys,
+          seedValues: keys.map((key: string) => parsed[key] ?? null),
+        }
       } catch {
-        return null
+        return { seedKeys: keys, seedValues: null as number[] | null }
       }
-    }, { keys: seeds })
-    expect(seededHistory).toEqual(Array(seeds.length).fill(practiceGoal))
+    })
+    expect(seedValues).toEqual(Array(seedKeys.length).fill(practiceGoal))
     await page.evaluate(() => {
       document
         .querySelectorAll('.practice-day--future .practice-day-dot')

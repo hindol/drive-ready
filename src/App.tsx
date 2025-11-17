@@ -66,6 +66,7 @@ const PRACTICE_CALENDAR_WINDOW_RADIUS = 3
 const PRACTICE_HISTORY_STORAGE_KEY = 'driveready-practice-history-v1'
 const LEGACY_PRACTICE_HISTORY_STORAGE_KEY = 'drivingtestapp-practice-history-v1'
 const EMPTY_REVIEW_DATA: Record<number, ReviewCard> = {}
+const DEFAULT_TIME_ZONE = 'UTC'
 
 type PersistedTestState = {
   status: 'idle' | 'in-progress' | 'complete'
@@ -91,6 +92,34 @@ type PersistedSession = {
   test?: PersistedTestState
   review?: PersistedReviewState
   practiceHistory?: PracticeHistory
+  timeZone?: string
+}
+
+const detectBrowserTimeZone = (): string | undefined => {
+  if (typeof window === 'undefined') {
+    return undefined
+  }
+  if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+    return undefined
+  }
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone
+  } catch {
+    return undefined
+  }
+}
+
+const toISODateString = (date: Date): string => date.toISOString().slice(0, 10)
+
+const getDateFromKey = (key: string): Date => new Date(`${key}T00:00:00.000Z`)
+
+const shiftDateKey = (key: string, offset: number): string => {
+  if (offset === 0) {
+    return key
+  }
+  const cursor = getDateFromKey(key)
+  cursor.setUTCDate(cursor.getUTCDate() + offset)
+  return toISODateString(cursor)
 }
 
 const createSessionId = (): string => {
@@ -110,10 +139,14 @@ const ratingLabels: Record<ReviewRating, { label: string; className: string }> =
     easy: { label: 'Easy', className: 'text-bg-success' },
   }
 
-const getStartOfToday = (): Date => {
-  const date = new Date()
-  date.setHours(0, 0, 0, 0)
-  return date
+const getStartOfToday = (timeZone?: string): Date => {
+  if (!timeZone) {
+    const date = new Date()
+    date.setHours(0, 0, 0, 0)
+    return date
+  }
+  const todayKey = getDateKey(new Date(), timeZone)
+  return getDateFromKey(todayKey)
 }
 
 const addDays = (date: Date, days: number): Date => {
@@ -127,8 +160,9 @@ const computeNextReviewCard = (
   questionId: Question['id'],
   existing: ReviewCard | undefined,
   rating: ReviewRating,
+  timeZone?: string,
 ): ReviewCard => {
-  const today = getStartOfToday()
+  const today = getStartOfToday(timeZone)
   const lastInterval = existing?.interval ?? 0
   let ease = existing?.ease ?? INITIAL_EASE
   let nextInterval = lastInterval > 0 ? lastInterval : 1
@@ -197,7 +231,9 @@ const shuffleQuestionChoices = (question: Question): Question => {
     return { ...question, choices: [...question.choices] }
   }
 
-  const indices = question.choices.map((_, index) => index)
+  const indices = question.choices.map(
+    (_choice: string, index: number): number => index,
+  )
   for (let position = indices.length - 1; position > 0; position -= 1) {
     const swapWith = Math.floor(Math.random() * (position + 1))
     ;[indices[position], indices[swapWith]] = [
@@ -207,7 +243,7 @@ const shuffleQuestionChoices = (question: Question): Question => {
   }
 
   const shuffledChoices = indices.map(
-    (originalIndex) => question.choices[originalIndex],
+    (originalIndex: number) => question.choices[originalIndex],
   )
   const shuffledAnswerIndex = indices.indexOf(question.answerIndex)
 
@@ -244,49 +280,64 @@ const washingtonContent: StateContent = {
 
 const QUESTIONS_PER_ATTEMPT = 10
 
-const getDateKey = (date: Date) => date.toISOString().slice(0, 10)
+const getDateKey = (date: Date, timeZone?: string): string => {
+  if (
+    timeZone &&
+    typeof Intl !== 'undefined' &&
+    typeof Intl.DateTimeFormat === 'function'
+  ) {
+    try {
+      return new Intl.DateTimeFormat('en-CA', {
+        timeZone,
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+      }).format(date)
+    } catch {
+      // fall back to ISO string
+    }
+  }
+  return toISODateString(date)
+}
 
 const buildPracticeCalendar = (
   history: PracticeHistory,
+  timeZone?: string,
 ): PracticeCalendarDay[] => {
-  const today = getStartOfToday()
-  const todayKey = getDateKey(today)
-  const windowStart = new Date(today)
-  windowStart.setDate(today.getDate() - PRACTICE_CALENDAR_WINDOW_RADIUS)
-
-  return Array.from(
-    { length: PRACTICE_CALENDAR_WINDOW_RADIUS * 2 + 1 },
-    (_, index) => {
-      const date = new Date(windowStart)
-      date.setDate(windowStart.getDate() + index)
-      date.setHours(0, 0, 0, 0)
-      const key = getDateKey(date)
-      const isPast = date.getTime() < today.getTime()
-      const isFuture = date.getTime() > today.getTime()
-      return {
-        date,
-        key,
-        questions: history[key] ?? 0,
-        isToday: key === todayKey,
-        isPast,
-        isFuture,
-      }
-    },
-  )
+  const todayKey = getDateKey(new Date(), timeZone)
+  const days: PracticeCalendarDay[] = []
+  for (
+    let offset = -PRACTICE_CALENDAR_WINDOW_RADIUS;
+    offset <= PRACTICE_CALENDAR_WINDOW_RADIUS;
+    offset += 1
+  ) {
+    const key = shiftDateKey(todayKey, offset)
+    const date = getDateFromKey(key)
+    days.push({
+      date,
+      key,
+      questions: history[key] ?? 0,
+      isToday: key === todayKey,
+      isPast: offset < 0,
+      isFuture: offset > 0,
+    })
+  }
+  return days
 }
 
 const computePracticeStreak = (
   history: PracticeHistory,
   goal: number,
+  timeZone?: string,
 ): number => {
   let streak = 0
-  const cursor = new Date()
+  let cursor = getDateFromKey(getDateKey(new Date(), timeZone))
 
   while (streak < 365) {
-    const key = getDateKey(cursor)
+    const key = toISODateString(cursor)
     if ((history[key] ?? 0) >= goal) {
       streak += 1
-      cursor.setDate(cursor.getDate() - 1)
+      cursor.setUTCDate(cursor.getUTCDate() - 1)
     } else {
       break
     }
@@ -296,8 +347,14 @@ const computePracticeStreak = (
 }
 
 function App() {
+  const [userTimeZone, setUserTimeZone] = useState<string | undefined>(() =>
+    detectBrowserTimeZone(),
+  )
   const stateCode: SupportedStateCode = ACTIVE_STATE_CODE
   const content = washingtonContent
+  const fallbackTimeZone = useMemo(() => detectBrowserTimeZone(), [])
+  const resolvedTimeZone =
+    userTimeZone ?? fallbackTimeZone ?? DEFAULT_TIME_ZONE
   const activeQuestionBank = useMemo<Question[]>(
     () => questionBank[stateCode] ?? [],
     [stateCode],
@@ -407,6 +464,11 @@ function App() {
     if (!parsedSession.id) {
       parsedSession.id = createSessionId()
     }
+    const browserTimeZone = detectBrowserTimeZone()
+    const sessionTimeZone =
+      parsedSession.timeZone ?? browserTimeZone ?? DEFAULT_TIME_ZONE
+    parsedSession.timeZone = sessionTimeZone
+    setUserTimeZone(sessionTimeZone)
     setSessionId(parsedSession.id)
     const persistedStateCode = parsedSession.stateCode ?? stateCode
     const persistedQuestionBank: Question[] =
@@ -532,6 +594,7 @@ function App() {
       ...parsedSession,
       stateCode: persistedStateCode,
       practiceHistory: mergedPracticeHistory,
+      timeZone: sessionTimeZone,
     }
     window.localStorage.setItem(
       SESSION_STORAGE_KEY,
@@ -610,20 +673,43 @@ function App() {
   const currentReferenceUrl = currentQuestion
     ? getReferenceLink(currentQuestion.reference)
     : undefined
-  const todayKey = getDateKey(new Date())
+  const todayKey = getDateKey(new Date(), resolvedTimeZone)
   const todayQuestionCount = practiceHistory[todayKey] ?? 0
   const hasMetPracticeGoal = todayQuestionCount >= practiceGoalTarget
   const practiceStreak = useMemo(
-    () => computePracticeStreak(practiceHistory, practiceGoalTarget),
-    [practiceHistory, practiceGoalTarget],
+    () =>
+      computePracticeStreak(
+        practiceHistory,
+        practiceGoalTarget,
+        resolvedTimeZone,
+      ),
+    [practiceGoalTarget, practiceHistory, resolvedTimeZone],
   )
   const practiceCalendar = useMemo(() => {
-    const days = buildPracticeCalendar(practiceHistory)
+    const days = buildPracticeCalendar(practiceHistory, resolvedTimeZone)
     const completedDays = days.filter(
       (day) => day.questions >= practiceGoalTarget,
     ).length
     return { days, completedDays, totalDays: days.length }
-  }, [practiceHistory, practiceGoalTarget])
+  }, [practiceGoalTarget, practiceHistory, resolvedTimeZone])
+  const weekdayFormatter = useMemo(() => {
+    if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+      return undefined
+    }
+    return new Intl.DateTimeFormat(undefined, {
+      weekday: 'narrow',
+      timeZone: resolvedTimeZone,
+    })
+  }, [resolvedTimeZone])
+  const dayNumberFormatter = useMemo(() => {
+    if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+      return undefined
+    }
+    return new Intl.DateTimeFormat(undefined, {
+      day: 'numeric',
+      timeZone: resolvedTimeZone,
+    })
+  }, [resolvedTimeZone])
   const isPracticeCalendarHydrating =
     isHydratingSession || !isPracticeHistoryHydrated
   const todayGoalPercent = Math.min(
@@ -651,7 +737,7 @@ function App() {
     [reviewStore, stateCode],
   )
   const dueQuestions = useMemo(() => {
-    const todayTime = getStartOfToday().getTime()
+    const todayTime = getStartOfToday(resolvedTimeZone).getTime()
     const dueList: { question: Question; dueTime: number }[] = []
 
     activeQuestionBank.forEach((question) => {
@@ -672,7 +758,7 @@ function App() {
 
     dueList.sort((a, b) => a.dueTime - b.dueTime)
     return dueList.map((entry) => entry.question)
-  }, [activeQuestionBank, activeReviewData])
+  }, [activeQuestionBank, activeReviewData, resolvedTimeZone])
 
   const newQuestions = useMemo(
     () =>
@@ -681,7 +767,7 @@ function App() {
   )
 
   const upcomingWithinWeek = useMemo(() => {
-    const todayTime = getStartOfToday().getTime()
+    const todayTime = getStartOfToday(resolvedTimeZone).getTime()
     const oneWeek = 7 * 24 * 60 * 60 * 1000
     return activeQuestionBank.reduce((count, question) => {
       const card = activeReviewData[question.id]
@@ -697,10 +783,10 @@ function App() {
       }
       return count
     }, 0)
-  }, [activeQuestionBank, activeReviewData])
+  }, [activeQuestionBank, activeReviewData, resolvedTimeZone])
 
   const nextDueDate = useMemo(() => {
-    const todayTime = getStartOfToday().getTime()
+    const todayTime = getStartOfToday(resolvedTimeZone).getTime()
     const candidates = Object.values(activeReviewData)
       .map((card) => new Date(card.due).getTime())
       .filter((time) => !Number.isNaN(time) && time > todayTime)
@@ -708,7 +794,7 @@ function App() {
       return null
     }
     return new Date(Math.min(...candidates))
-  }, [activeReviewData])
+  }, [activeReviewData, resolvedTimeZone])
 
   const nextDueLabel = useMemo(() => {
     if (!nextDueDate) {
@@ -762,7 +848,7 @@ function App() {
 
   const buildAdaptivePool = useCallback((): Question[] => {
     const seen = new Set<number>()
-    const todayTime = getStartOfToday().getTime()
+    const todayTime = getStartOfToday(resolvedTimeZone).getTime()
     const strugglingSet = new Set<number>()
     const strugglingQuestions = activeQuestionBank.filter((question) => {
       const card = activeReviewData[question.id]
@@ -810,6 +896,7 @@ function App() {
     newQuestionIdSet,
     dueQuestions,
     newQuestions,
+    resolvedTimeZone,
   ])
 
   const applyReviewRating = (questionId: number, rating: ReviewRating) => {
@@ -819,6 +906,7 @@ function App() {
         questionId,
         stateRecords[questionId],
         rating,
+        resolvedTimeZone,
       )
       return {
         ...previous,
@@ -828,7 +916,7 @@ function App() {
   }
 
   const incrementDailyQuestionProgress = () => {
-    const key = getDateKey(new Date())
+    const key = getDateKey(new Date(), resolvedTimeZone)
     setPracticeHistory((previous) => {
       const current = previous[key] ?? 0
       return { ...previous, [key]: current + 1 }
@@ -877,6 +965,7 @@ function App() {
       test: persistedTest,
       review: persistedReview,
       practiceHistory: persistedPracticeHistory,
+      timeZone: resolvedTimeZone,
     }
     window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(payload))
   }, [
@@ -891,6 +980,7 @@ function App() {
     reviewStatus,
     responses,
     questionExposureCounts,
+    resolvedTimeZone,
     sessionId,
     stateCode,
     testQuestions,
@@ -1414,12 +1504,17 @@ function App() {
                                     className={dayClasses.join(' ')}
                                   >
                                     <span className="practice-day-letter">
-                                      {day.date.toLocaleDateString(undefined, {
-                                        weekday: 'narrow',
-                                      })}
+                                      {weekdayFormatter
+                                        ? weekdayFormatter.format(day.date)
+                                        : day.date.toLocaleDateString(
+                                            undefined,
+                                            { weekday: 'narrow' },
+                                          )}
                                     </span>
                                     <span className="practice-day-date">
-                                      {day.date.getDate()}
+                                      {dayNumberFormatter
+                                        ? dayNumberFormatter.format(day.date)
+                                        : day.date.getUTCDate()}
                                     </span>
                                     {isMet && (
                                       <>
