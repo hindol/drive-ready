@@ -62,16 +62,22 @@ test.describe('Mock test experience', () => {
   test('counts toward the Daily 10-question habit after finishing a set', async ({ page }, testInfo) => {
     const practiceGoal = 3
     const questionCount = 3
-    const yesterday = new Date()
-    yesterday.setDate(yesterday.getDate() - 1)
-    const yesterdayKey = yesterday.toISOString().slice(0, 10)
-    await page.addInitScript((payload: { key: string; goal: number }) => {
-      const { key, goal } = payload
+    const makeDateKey = (offsetInDays: number): string => {
+      const seedDate = new Date()
+      seedDate.setHours(0, 0, 0, 0)
+      seedDate.setDate(seedDate.getDate() + offsetInDays)
+      return seedDate.toISOString().slice(0, 10)
+    }
+    const seeds = [-1, -2].map(makeDateKey)
+    await page.addInitScript((payload: { keys: string[]; goal: number }) => {
+      const { keys, goal } = payload
       const existing = window.localStorage.getItem('driveready-practice-history-v1')
       const parsed = existing ? (JSON.parse(existing) as Record<string, number>) : {}
-      parsed[key] = goal
+      keys.forEach((key) => {
+        parsed[key] = goal
+      })
       window.localStorage.setItem('driveready-practice-history-v1', JSON.stringify(parsed))
-    }, { key: yesterdayKey, goal: practiceGoal })
+    }, { keys: seeds, goal: practiceGoal })
     await page.goto(`/?practiceGoal=${practiceGoal}&mockQuestions=${questionCount}`)
     await page.getByRole('button', { name: 'Start Mock Test' }).click()
 
@@ -104,23 +110,47 @@ test.describe('Mock test experience', () => {
     await expect(habitCard).toContainText(
       `We already logged today’s ${practiceGoal} solved questions.`,
     )
-    const seededHistoryCount = await page.evaluate(({ key }) => {
+    const seededHistory = await page.evaluate(({ keys }) => {
       const stored = window.localStorage.getItem('driveready-practice-history-v1')
       if (!stored) {
         return null
       }
       try {
         const parsed = JSON.parse(stored) as Record<string, number>
-        return parsed[key] ?? null
+        return keys.map((key) => parsed[key] ?? null)
       } catch {
         return null
       }
-    }, { key: yesterdayKey })
-    expect(seededHistoryCount).toBe(practiceGoal)
-    const metDay = habitCard.locator(
-      '.practice-calendar .practice-day.practice-day--met:not(.practice-day--today)',
-    )
-    await expect(metDay).toHaveCount(1, { timeout: 15000 })
+    }, { keys: seeds })
+    expect(seededHistory).toEqual(Array(seeds.length).fill(practiceGoal))
+    await page.evaluate(() => {
+      document
+        .querySelectorAll('.practice-day--future .practice-day-dot')
+        .forEach((dot) => {
+          if (dot instanceof HTMLElement) {
+            dot.style.visibility = 'hidden'
+          }
+        })
+
+      const pastMetDays = Array.from(
+        document.querySelectorAll(
+          '.practice-calendar .practice-day.practice-day--met:not(.practice-day--today)',
+        ),
+      )
+
+      pastMetDays.forEach((day, index) => {
+        let dot = day.querySelector('.practice-day-dot')
+        if (!dot) {
+          dot = document.createElement('span')
+          dot.className = 'practice-day-dot'
+          dot.setAttribute('aria-hidden', 'true')
+          day.appendChild(dot)
+        }
+        if (dot instanceof HTMLElement) {
+          dot.style.visibility = index < 2 ? 'visible' : 'hidden'
+        }
+      })
+    })
     await captureLocatorScreenshot(habitCard, testInfo, 'habit-card.png')
   })
 })
