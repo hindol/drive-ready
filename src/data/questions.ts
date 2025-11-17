@@ -1742,6 +1742,63 @@ export const WA_QUESTIONS: Question[] = [
     reference:
       'Washington Driver Guide (2023), 4.19: Transporting – Secure your load',
   },
+  {
+    id: 110,
+    prompt: `Southbound on I-5 near Tacoma, this added lane warning pops up as an on-ramp opens into the right side of the freeway. What should you do as you approach the sign?`,
+    choices: [
+      'Hold your lane and speed while scanning mirrors so entering drivers can use the brand-new lane without forcing you to merge',
+      'Dive left immediately because the right lane is ending',
+      'Stop in your lane and wave ramp traffic through',
+      'Move onto the shoulder so you can merge later',
+    ],
+    answerIndex: 0,
+    explanation: `An added lane sign tells you the ramp is creating another through lane, so you keep your path steady, check mirrors, and let the new lane form without abrupt merges.`,
+    quote:
+      'Some, but not all, Washington State signs are listed below. You are responsible for knowing all signs, including city and county signs. Added lane (from right, no merging required)',
+    reference: 'Washington Driver Guide (2023), 4.12: Other traffic signs',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/0/04/MUTCD_W4-3R.svg',
+    imageAlt:
+      'MUTCD W4-3R added lane warning sign showing a new lane joining from the right',
+  },
+  {
+    id: 111,
+    prompt: `You’re piloting a 13-foot box truck through downtown Seattle when this low clearance sign warns of a 12-foot-8-inch underpass ahead. How should you respond?`,
+    choices: [
+      'Stop before the structure and reroute because your vehicle is taller than the posted clearance',
+      'Proceed slowly—clearance signs don’t apply if you drive under 10 mph',
+      'Drive down the centerline to “gain” a few extra inches',
+      'Duck inside the cab so the truck clears the bridge',
+    ],
+    answerIndex: 0,
+    explanation: `Low clearance warnings mean anything taller than the posted height must not enter, so you stop early and pick another route before striking the bridge.`,
+    quote:
+      'Some, but not all, Washington State signs are listed below. You are responsible for knowing all signs, including city and county signs. Low clearance',
+    reference: 'Washington Driver Guide (2023), 4.12: Other traffic signs',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/6/6a/MUTCD_W12-2.svg',
+    imageAlt:
+      'MUTCD W12-2 low clearance warning sign with opposing arrows and height value',
+  },
+  {
+    id: 112,
+    prompt: `While cruising SR 105 along Washington’s coast you pass this tsunami sign just as your phone blares an alert about a distant quake. What’s the correct move?`,
+    choices: [
+      'Leave the waterfront immediately and follow the arrowed evacuation route to higher ground',
+      'Park on the seawall to watch the waves until officials give more details',
+      'Drive onto the beach so the water can flow around you',
+      'Ignore the sign unless you physically see a tsunami crest',
+    ],
+    answerIndex: 0,
+    explanation: `Tsunami hazard zones require you to evacuate low-lying areas the moment a warning sounds, using the posted route toward higher, inland ground.`,
+    quote:
+      'Some, but not all, Washington State signs are listed below. You are responsible for knowing all signs, including city and county signs. Tsunami hazard zone',
+    reference: 'Washington Driver Guide (2023), 4.12: Other traffic signs',
+    image:
+      'https://upload.wikimedia.org/wikipedia/commons/c/c7/MUTCD_EM1-2.svg',
+    imageAlt:
+      'MUTCD EM1-2 tsunami evacuation route sign with wave symbol and arrow',
+  },
 ]
 
 export const questionBank: QuestionBank = {
