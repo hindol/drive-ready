@@ -66,11 +66,75 @@ const getTodayPracticeCount = async (page: Page) => {
   })
 }
 
+const getSessionPayload = async <TSession = Record<string, unknown> | null>(page: Page) => {
+  const payload = await page.evaluate(() => window.localStorage.getItem('driveready-session-v1'))
+  return payload ? (JSON.parse(payload) as TSession) : null
+}
+
+const markSessionWithDayOffset = async (page: Page, offsetDays: number) => {
+  await page.evaluate((offset) => {
+    const detectTimeZone = (): string | undefined => {
+      if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+        return undefined
+      }
+      try {
+        return Intl.DateTimeFormat().resolvedOptions().timeZone
+      } catch {
+        return undefined
+      }
+    }
+    const shiftDateKey = (key: string, offsetAmount: number): string => {
+      if (!offsetAmount) {
+        return key
+      }
+      const cursor = new Date(`${key}T00:00:00.000Z`)
+      cursor.setUTCDate(cursor.getUTCDate() + offsetAmount)
+      return cursor.toISOString().slice(0, 10)
+    }
+    const getDateKey = (date: Date, timeZone?: string): string => {
+      if (
+        timeZone &&
+        typeof Intl !== 'undefined' &&
+        typeof Intl.DateTimeFormat === 'function'
+      ) {
+        try {
+          return new Intl.DateTimeFormat('en-CA', {
+            timeZone,
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+          }).format(date)
+        } catch {
+          // fall back to ISO slicing
+        }
+      }
+      return date.toISOString().slice(0, 10)
+    }
+    const stored = window.localStorage.getItem('driveready-session-v1')
+    if (!stored) {
+      return
+    }
+    try {
+      const parsed = JSON.parse(stored) as { timeZone?: string; testDayKey?: string }
+      const timeZone = parsed.timeZone ?? detectTimeZone()
+      const todayKey = getDateKey(new Date(), timeZone)
+      parsed.testDayKey = shiftDateKey(todayKey, offset)
+      window.localStorage.setItem('driveready-session-v1', JSON.stringify(parsed))
+    } catch {
+      // ignore malformed payloads
+    }
+  }, offsetDays)
+}
+
 test.describe('Mock test experience', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      window.localStorage.clear()
-    })
+    const sessionMarker = `driveready-test-${Date.now()}-${Math.random()}`
+    await page.addInitScript((marker: string) => {
+      if (window.name !== marker) {
+        window.localStorage.clear()
+        window.name = marker
+      }
+    }, sessionMarker)
   })
 
   test('shows explanation after answering and only surfaces review alert on repeat view', async ({ page }, testInfo) => {
@@ -242,5 +306,49 @@ test.describe('Mock test experience', () => {
       })
     })
     await captureLocatorScreenshot(habitCard, testInfo, 'habit-card.png')
+  })
+
+  test('automatically restarts mock test progress on a new local day', async ({ page }) => {
+    const questionCount = 3
+    await page.goto(`/?mockQuestions=${questionCount}`)
+    await page.getByRole('button', { name: 'Start Mock Test' }).click()
+
+    const choice = page.locator('.list-group .list-group-item').first()
+    await choice.waitFor({ state: 'visible' })
+    await choice.click()
+    const actionButton = page.getByRole('button', {
+      name: /Save & Next|Finish Test|Review Complete/,
+    })
+    await actionButton.waitFor({ state: 'visible' })
+    await expect(actionButton).toBeEnabled()
+    await actionButton.click()
+
+    const answeredStat = page.locator('.score-stat-chip', { hasText: 'Answered' })
+    await expect(answeredStat).toContainText(`1 / ${questionCount}`)
+    await expect
+      .poll(async () => {
+        const session = (await getSessionPayload(page)) as
+          | { test?: { responses?: Record<string, number> } }
+          | null
+        return Object.keys(session?.test?.responses ?? {}).length
+      })
+      .toBeGreaterThan(0)
+
+    await markSessionWithDayOffset(page, -1)
+    await page.reload()
+
+    const introCardHeading = page.getByRole('heading', {
+      name: 'Ready to try the official-style knowledge test?',
+    })
+    await expect(introCardHeading).toBeVisible({ timeout: 15000 })
+    await expect(page.getByRole('button', { name: 'Start Mock Test' })).toBeVisible()
+    await expect(answeredStat).toContainText(`0 / ${questionCount}`, {
+      timeout: 15000,
+    })
+    const correctStat = page.locator('.score-stat-chip', { hasText: 'Correct' })
+    await expect(correctStat).toContainText('0', { timeout: 15000 })
+    await expect
+      .poll(async () => getTodayPracticeCount(page), { timeout: 10000 })
+      .toBe(1)
   })
 })

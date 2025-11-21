@@ -93,13 +93,17 @@ type PersistedSession = {
   review?: PersistedReviewState
   practiceHistory?: PracticeHistory
   timeZone?: string
+  testDayKey?: string
 }
 
 const detectBrowserTimeZone = (): string | undefined => {
   if (typeof window === 'undefined') {
     return undefined
   }
-  if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+  if (
+    typeof Intl === 'undefined' ||
+    typeof Intl.DateTimeFormat !== 'function'
+  ) {
     return undefined
   }
   try {
@@ -331,7 +335,7 @@ const computePracticeStreak = (
   timeZone?: string,
 ): number => {
   let streak = 0
-  let cursor = getDateFromKey(getDateKey(new Date(), timeZone))
+  const cursor = getDateFromKey(getDateKey(new Date(), timeZone))
 
   while (streak < 365) {
     const key = toISODateString(cursor)
@@ -353,8 +357,7 @@ function App() {
   const stateCode: SupportedStateCode = ACTIVE_STATE_CODE
   const content = washingtonContent
   const fallbackTimeZone = useMemo(() => detectBrowserTimeZone(), [])
-  const resolvedTimeZone =
-    userTimeZone ?? fallbackTimeZone ?? DEFAULT_TIME_ZONE
+  const resolvedTimeZone = userTimeZone ?? fallbackTimeZone ?? DEFAULT_TIME_ZONE
   const activeQuestionBank = useMemo<Question[]>(
     () => questionBank[stateCode] ?? [],
     [stateCode],
@@ -429,6 +432,7 @@ function App() {
   const [practiceHistory, setPracticeHistory] = useState<PracticeHistory>({})
   const [sessionId, setSessionId] = useState('')
   const [isHydratingSession, setIsHydratingSession] = useState(true)
+  const [testDayKey, setTestDayKey] = useState<string | undefined>(undefined)
   const [isReviewStoreHydrated, setIsReviewStoreHydrated] = useState(false)
   const [isPracticeHistoryHydrated, setIsPracticeHistoryHydrated] =
     useState(false)
@@ -468,6 +472,7 @@ function App() {
     const sessionTimeZone =
       parsedSession.timeZone ?? browserTimeZone ?? DEFAULT_TIME_ZONE
     parsedSession.timeZone = sessionTimeZone
+    const todayKey = getDateKey(new Date(), sessionTimeZone)
     setUserTimeZone(sessionTimeZone)
     setSessionId(parsedSession.id)
     const persistedStateCode = parsedSession.stateCode ?? stateCode
@@ -581,6 +586,14 @@ function App() {
       ...persistedPracticeHistory,
       ...dedicatedPracticeHistory,
     }
+    const hydratedTestDayKey = parsedSession.test
+      ? (parsedSession.testDayKey ??
+        ((mergedPracticeHistory[todayKey] ?? 0) > 0
+          ? todayKey
+          : shiftDateKey(todayKey, -1)))
+      : undefined
+    setTestDayKey(hydratedTestDayKey)
+    parsedSession.testDayKey = hydratedTestDayKey
     setPracticeHistory((previous) => {
       if (!Object.keys(previous).length) {
         return mergedPracticeHistory
@@ -595,6 +608,7 @@ function App() {
       stateCode: persistedStateCode,
       practiceHistory: mergedPracticeHistory,
       timeZone: sessionTimeZone,
+      testDayKey: hydratedTestDayKey,
     }
     window.localStorage.setItem(
       SESSION_STORAGE_KEY,
@@ -693,7 +707,10 @@ function App() {
     return { days, completedDays, totalDays: days.length }
   }, [practiceGoalTarget, practiceHistory, resolvedTimeZone])
   const weekdayFormatter = useMemo(() => {
-    if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+    if (
+      typeof Intl === 'undefined' ||
+      typeof Intl.DateTimeFormat !== 'function'
+    ) {
       return undefined
     }
     return new Intl.DateTimeFormat(undefined, {
@@ -702,7 +719,10 @@ function App() {
     })
   }, [resolvedTimeZone])
   const dayNumberFormatter = useMemo(() => {
-    if (typeof Intl === 'undefined' || typeof Intl.DateTimeFormat !== 'function') {
+    if (
+      typeof Intl === 'undefined' ||
+      typeof Intl.DateTimeFormat !== 'function'
+    ) {
       return undefined
     }
     return new Intl.DateTimeFormat(undefined, {
@@ -732,6 +752,7 @@ function App() {
   const hasSeenCurrentQuestionBefore = currentQuestionId
     ? (questionExposureCounts[currentQuestionId] ?? 0) > 1
     : false
+
   const activeReviewData = useMemo(
     () => reviewStore[stateCode] ?? EMPTY_REVIEW_DATA,
     [reviewStore, stateCode],
@@ -966,6 +987,7 @@ function App() {
       review: persistedReview,
       practiceHistory: persistedPracticeHistory,
       timeZone: resolvedTimeZone,
+      testDayKey,
     }
     window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(payload))
   }, [
@@ -983,6 +1005,7 @@ function App() {
     resolvedTimeZone,
     sessionId,
     stateCode,
+    testDayKey,
     testQuestions,
     testStatus,
   ])
@@ -1069,7 +1092,16 @@ function App() {
     })
   }, [currentQuestionId, hasActiveTest])
 
-  const handleStartTest = () => {
+  const resetMockTestProgress = useCallback(() => {
+    setTestQuestions([])
+    setResponses({})
+    setQuestionExposureCounts({})
+    setCurrentQuestionIndex(0)
+    setTestStatus('idle')
+    setManualAdjustments({})
+  }, [])
+
+  const handleStartTest = useCallback(() => {
     if (!activeQuestionBank.length) {
       return
     }
@@ -1092,11 +1124,38 @@ function App() {
     setCurrentQuestionIndex(0)
     setTestStatus('in-progress')
     setManualAdjustments({})
-  }
+    const nextDayKey = getDateKey(new Date(), resolvedTimeZone)
+    setTestDayKey(nextDayKey)
+  }, [
+    activeQuestionBank,
+    buildAdaptivePool,
+    questionTargetCount,
+    resolvedTimeZone,
+  ])
 
   const handleRestartTest = () => {
     handleStartTest()
   }
+
+  useEffect(() => {
+    if (isHydratingSession || !testDayKey) {
+      return
+    }
+    const latestDayKey = getDateKey(new Date(), resolvedTimeZone)
+    if (latestDayKey === testDayKey) {
+      return
+    }
+    if (hasActiveTest) {
+      resetMockTestProgress()
+    }
+    setTestDayKey(latestDayKey)
+  }, [
+    hasActiveTest,
+    isHydratingSession,
+    resetMockTestProgress,
+    resolvedTimeZone,
+    testDayKey,
+  ])
 
   const handleSelectOption = (answerIndex: number) => {
     if (
@@ -1181,6 +1240,7 @@ function App() {
       setReviewStore({})
       setPracticeHistory({})
       setQuestionExposureCounts({})
+      setTestDayKey(undefined)
       setSessionId(createSessionId())
       setShowResetDialog(false)
     } finally {
