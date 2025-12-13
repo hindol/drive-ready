@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="noindex" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DriveReady</title>
+    <script>
+      // GitHub Pages serves 404.html for unknown paths.
+      // Redirect back to the SPA root so the app can load.
+      (function () {
+        var repoBase = '/drive-ready/';
+        var current = window.location.pathname;
+        if (!current.startsWith(repoBase)) {
+          window.location.replace(repoBase);
+          return;
+        }
+        window.location.replace(repoBase + window.location.search + window.location.hash);
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>
