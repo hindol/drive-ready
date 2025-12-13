@@ -7,8 +7,8 @@
   padding: 6rem 0;
   background: linear-gradient(
     135deg,
-    rgba(22, 106, 156, 0.95),
-    rgba(24, 169, 153, 0.9)
+    rgba(31, 94, 153, 0.95),
+    rgba(224, 122, 95, 0.9)
   );
   overflow: hidden;
 }
@@ -64,7 +64,7 @@
 
 .card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 1.5rem 3rem rgba(22, 106, 156, 0.2);
+  box-shadow: 0 1.5rem 3rem rgba(31, 94, 153, 0.2);
 }
 
 .stat-card {
@@ -92,7 +92,7 @@
 .score-stat-chip {
   flex: 1 1 calc(50% - 0.4rem);
   min-width: 110px;
-  background-color: rgba(22, 106, 156, 0.04);
+  background-color: rgba(31, 94, 153, 0.04);
   border-radius: 0.55rem;
   padding: 0.35rem 0.45rem;
   display: flex;
@@ -145,8 +145,8 @@ footer a:hover {
 .practice-day {
   min-height: 56px;
   border-radius: 0.5rem;
-  border: 1px dashed rgba(22, 106, 156, 0.3);
-  background-color: rgba(22, 106, 156, 0.05);
+  border: 1px dashed rgba(31, 94, 153, 0.3);
+  background-color: rgba(31, 94, 153, 0.05);
   color: var(--driveready-primary-dark);
   font-weight: 600;
   display: flex;
@@ -178,17 +178,17 @@ footer a:hover {
 }
 
 .practice-day--met {
-  border-color: rgba(24, 169, 153, 0.45);
-  box-shadow: 0 0.5rem 1rem rgba(24, 169, 153, 0.12);
+  border-color: rgba(224, 122, 95, 0.55);
+  box-shadow: 0 0.5rem 1rem rgba(224, 122, 95, 0.14);
 }
 
 .practice-day--loading {
   border-style: solid;
-  border-color: rgba(22, 106, 156, 0.15);
+  border-color: rgba(31, 94, 153, 0.15);
   background: linear-gradient(
     135deg,
-    rgba(22, 106, 156, 0.08),
-    rgba(22, 106, 156, 0.02)
+    rgba(31, 94, 153, 0.08),
+    rgba(31, 94, 153, 0.02)
   );
   animation: practiceDayPulse 1.4s ease-in-out infinite;
   color: transparent;
@@ -210,12 +210,12 @@ footer a:hover {
 
 .practice-day--missed {
   opacity: 1;
-  border-color: rgba(15, 78, 115, 0.2);
+  border-color: rgba(21, 67, 110, 0.2);
 }
 
 .practice-day--future {
   border-style: dotted;
-  border-color: rgba(15, 78, 115, 0.2);
+  border-color: rgba(21, 67, 110, 0.2);
   opacity: 0.7;
 }
 
@@ -224,7 +224,7 @@ footer a:hover {
   border-width: 1px;
   border-color: var(--driveready-primary);
   background-color: var(--driveready-primary-muted);
-  box-shadow: 0 0 0 2px rgba(15, 78, 115, 0.2) inset;
+  box-shadow: 0 0 0 2px rgba(21, 67, 110, 0.2) inset;
 }
 
 .practice-day--today.practice-day--met,
@@ -235,11 +235,11 @@ footer a:hover {
 .practice-day--today.practice-day--met {
   background-color: var(--driveready-primary-muted);
   border-color: var(--driveready-primary);
-  box-shadow: 0 0 0 2px rgba(15, 78, 115, 0.2) inset;
+  box-shadow: 0 0 0 2px rgba(21, 67, 110, 0.2) inset;
 }
 
 .reset-progress-cta {
-  border-color: rgba(22, 106, 156, 0.15) !important;
+  border-color: rgba(31, 94, 153, 0.15) !important;
 }
 
 .reset-progress-cta .btn {
@@ -271,14 +271,14 @@ footer a:hover {
   width: min(220px, 100%);
   aspect-ratio: 1 / 1;
   border-radius: 0.85rem;
-  border: 1px solid rgba(15, 78, 115, 0.2);
+  border: 1px solid rgba(21, 67, 110, 0.2);
   padding: 0.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: #ffffff;
   margin: 0 auto 1rem;
-  box-shadow: 0 0.75rem 1.5rem rgba(22, 106, 156, 0.08);
+  box-shadow: 0 0.75rem 1.5rem rgba(31, 94, 153, 0.08);
 }
 
 .question-image-frame img {

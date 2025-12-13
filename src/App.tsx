@@ -62,7 +62,7 @@ const LEGACY_SESSION_STORAGE_KEY = 'drivingtestapp-session-v1'
 const PRACTICE_GOAL_QUESTIONS = 10
 const PRACTICE_GOAL_QUERY_PARAM = 'practiceGoal'
 const MOCK_QUESTION_COUNT_QUERY_PARAM = 'mockQuestions'
-const PRACTICE_CALENDAR_WINDOW_RADIUS = 3
+const PRACTICE_CALENDAR_DAYS_IN_WEEK = 7
 const PRACTICE_HISTORY_STORAGE_KEY = 'driveready-practice-history-v1'
 const LEGACY_PRACTICE_HISTORY_STORAGE_KEY = 'drivingtestapp-practice-history-v1'
 const EMPTY_REVIEW_DATA: Record<number, ReviewCard> = {}
@@ -304,28 +304,31 @@ const getDateKey = (date: Date, timeZone?: string): string => {
   return toISODateString(date)
 }
 
-const buildPracticeCalendar = (
+const buildPracticeWeek = (
   history: PracticeHistory,
+  weekOffset: number,
   timeZone?: string,
 ): PracticeCalendarDay[] => {
   const todayKey = getDateKey(new Date(), timeZone)
+  const anchorKey = shiftDateKey(
+    todayKey,
+    weekOffset * PRACTICE_CALENDAR_DAYS_IN_WEEK,
+  )
   const days: PracticeCalendarDay[] = []
-  for (
-    let offset = -PRACTICE_CALENDAR_WINDOW_RADIUS;
-    offset <= PRACTICE_CALENDAR_WINDOW_RADIUS;
-    offset += 1
-  ) {
-    const key = shiftDateKey(todayKey, offset)
+
+  for (let dayOffset = -3; dayOffset <= 3; dayOffset += 1) {
+    const key = shiftDateKey(anchorKey, dayOffset)
     const date = getDateFromKey(key)
     days.push({
       date,
       key,
       questions: history[key] ?? 0,
       isToday: key === todayKey,
-      isPast: offset < 0,
-      isFuture: offset > 0,
+      isPast: key < todayKey,
+      isFuture: key > todayKey,
     })
   }
+
   return days
 }
 
@@ -354,6 +357,7 @@ function App() {
   const [userTimeZone, setUserTimeZone] = useState<string | undefined>(() =>
     detectBrowserTimeZone(),
   )
+  const [practiceWeekOffset, setPracticeWeekOffset] = useState(0)
   const stateCode: SupportedStateCode = ACTIVE_STATE_CODE
   const content = washingtonContent
   const fallbackTimeZone = useMemo(() => detectBrowserTimeZone(), [])
@@ -700,12 +704,16 @@ function App() {
     [practiceGoalTarget, practiceHistory, resolvedTimeZone],
   )
   const practiceCalendar = useMemo(() => {
-    const days = buildPracticeCalendar(practiceHistory, resolvedTimeZone)
+    const days = buildPracticeWeek(
+      practiceHistory,
+      practiceWeekOffset,
+      resolvedTimeZone,
+    )
     const completedDays = days.filter(
       (day) => day.questions >= practiceGoalTarget,
     ).length
     return { days, completedDays, totalDays: days.length }
-  }, [practiceGoalTarget, practiceHistory, resolvedTimeZone])
+  }, [practiceGoalTarget, practiceHistory, practiceWeekOffset, resolvedTimeZone])
   const weekdayFormatter = useMemo(() => {
     if (
       typeof Intl === 'undefined' ||
@@ -730,6 +738,19 @@ function App() {
       timeZone: resolvedTimeZone,
     })
   }, [resolvedTimeZone])
+  const weekRangeFormatter = useMemo(() => {
+    if (
+      typeof Intl === 'undefined' ||
+      typeof Intl.DateTimeFormat !== 'function'
+    ) {
+      return undefined
+    }
+    return new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+      timeZone: 'UTC',
+    })
+  }, [])
   const isPracticeCalendarHydrating =
     isHydratingSession || !isPracticeHistoryHydrated
   const todayGoalPercent = Math.min(
@@ -1521,20 +1542,61 @@ function App() {
                         </small>
                       </div>
                       <div className="practice-calendar mt-2">
-                        <p className="tiny-label text-muted d-flex justify-content-between mb-2">
-                          <span>7-day snapshot</span>
-                          <span className="text-primary fw-semibold">
+                        <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
+                          <p className="tiny-label text-muted mb-0">Week view</p>
+                          <span className="text-primary fw-semibold small">
                             {practiceCalendar.completedDays}/
                             {practiceCalendar.totalDays}
                           </span>
-                        </p>
+                        </div>
+                        <div className="d-flex align-items-center justify-content-between gap-2 mb-2">
+                          <span className="text-muted small">
+                            {practiceCalendar.days.length && weekRangeFormatter
+                              ? `${weekRangeFormatter.format(practiceCalendar.days[0].date)}–${weekRangeFormatter.format(practiceCalendar.days[practiceCalendar.days.length - 1].date)}`
+                              : ''}
+                          </span>
+                          <div
+                            className="btn-group btn-group-sm"
+                            role="group"
+                            aria-label="Practice calendar week navigation"
+                          >
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary"
+                              onClick={() => setPracticeWeekOffset((current) => current - 1)}
+                            >
+                              Previous
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-outline-primary"
+                              disabled={practiceWeekOffset === 0}
+                              onClick={() =>
+                                setPracticeWeekOffset((current) =>
+                                  Math.min(0, current + 1),
+                                )
+                              }
+                            >
+                              Next
+                            </button>
+                            {practiceWeekOffset !== 0 && (
+                              <button
+                                type="button"
+                                className="btn btn-outline-primary"
+                                onClick={() => setPracticeWeekOffset(0)}
+                              >
+                                This week
+                              </button>
+                            )}
+                          </div>
+                        </div>
                         <div
                           className="practice-calendar-grid"
                           aria-live="polite"
                         >
                           {isPracticeCalendarHydrating
                             ? Array.from({
-                                length: PRACTICE_CALENDAR_WINDOW_RADIUS * 2 + 1,
+                                length: PRACTICE_CALENDAR_DAYS_IN_WEEK,
                               }).map((_, index) => (
                                 <span
                                   key={`practice-day-loading-${index}`}

@@ -1,5 +1,7 @@
 # DriveReady Theme Palette Explorer
 
+Looking for the newer, **less-muted** palettes mapped to the app tokens? See `palette-preview.md` at the repo root.
+
 Preview muted blue palettes directly inside VS Code (open this file in the Markdown preview panel to see the swatches).
 
 ## How to read the swatches
