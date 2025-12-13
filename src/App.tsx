@@ -1764,7 +1764,7 @@ function App() {
                                   <strong>Explanation:</strong>{' '}
                                   {currentQuestion.explanation}
                                   <br />
-                                  <strong>From the official guide:</strong>{' '}
+                                  <strong>Based on the official guide:</strong>{' '}
                                   <em>{currentQuestion.quote}</em>
                                   <br />
                                   <small className="text-muted">
@@ -2029,7 +2029,7 @@ function App() {
                               <strong>Explanation:</strong>{' '}
                               {reviewInProgressQuestion.explanation}
                               <br />
-                              <strong>From the official guide:</strong>{' '}
+                              <strong>Based on the official guide:</strong>{' '}
                               <em>{reviewInProgressQuestion.quote}</em>
                               <br />
                               <small className="text-muted">
